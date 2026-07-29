@@ -1,0 +1,441 @@
+﻿<?php
+session_start();
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') { header('Location: ../login.php'); exit; }
+require_once '../config/db.php';
+require_once '../libraries/fpdf.php';
+
+// Auto-create internships table if missing
+try {
+    $conn->query("SELECT internship_id FROM internships LIMIT 1");
+} catch (Exception $e) {
+    $conn->exec("CREATE TABLE internships (
+        internship_id INT PRIMARY KEY AUTO_INCREMENT,
+        student_id INT NOT NULL,
+        company_name VARCHAR(255) NOT NULL,
+        role VARCHAR(255) NOT NULL,
+        duration VARCHAR(100) NOT NULL,
+        stipend DECIMAL(10,2) DEFAULT NULL,
+        project_title VARCHAR(255) DEFAULT NULL,
+        project_description TEXT DEFAULT NULL,
+        technologies_used TEXT DEFAULT NULL,
+        start_date DATE DEFAULT NULL,
+        end_date DATE DEFAULT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES students(student_id) ON DELETE CASCADE
+    )");
+}
+
+$student_id = (int)($_GET['id'] ?? 0);
+
+$stmt = $conn->prepare("SELECT s.*, d.dept_name FROM students s JOIN departments d ON s.dept_id = d.dept_id WHERE s.student_id = ?");
+$stmt->execute([$student_id]);
+$student = $stmt->fetch();
+if (!$student) { die('Student not found.'); }
+
+// Average CGPA
+$cgpaSum = 0; $cgpaCount = 0;
+for ($i = 1; $i <= 8; $i++) {
+    if (!empty($student['cgpa_sem'.$i])) { $cgpaSum += $student['cgpa_sem'.$i]; $cgpaCount++; }
+}
+$averageCgpa = $cgpaCount > 0 ? round($cgpaSum / $cgpaCount, 2) : null;
+
+// Fetch data
+$appStmt = $conn->prepare("SELECT a.*, c.company_name, d.drive_date FROM applications a JOIN drives d ON a.drive_id = d.drive_id JOIN companies c ON d.company_id = c.company_id WHERE a.student_id = ? ORDER BY a.applied_at DESC");
+$appStmt->execute([$student_id]); $applications = $appStmt->fetchAll();
+
+$internshipStmt = $conn->prepare("SELECT * FROM internships WHERE student_id = ? ORDER BY start_date DESC");
+$internshipStmt->execute([$student_id]); $internships = $internshipStmt->fetchAll();
+
+try {
+    $projectStmt = $conn->prepare("SELECT * FROM projects WHERE student_id = ? ORDER BY start_date DESC");
+    $projectStmt->execute([$student_id]); $projects = $projectStmt->fetchAll();
+} catch (Exception $e) { $projects = []; }
+
+$skillStmt = $conn->prepare("SELECT * FROM skills WHERE student_id = ? ORDER BY created_at DESC");
+$skillStmt->execute([$student_id]); $skills = $skillStmt->fetchAll();
+
+try {
+    $interestStmt = $conn->prepare("SELECT * FROM area_of_interest WHERE student_id = ?");
+    $interestStmt->execute([$student_id]); $interests = $interestStmt->fetchAll();
+} catch (Exception $e) { $interests = []; }
+
+// Safe string for FPDF (windows-1252)
+function safe($s) {
+    return iconv('UTF-8', 'windows-1252//TRANSLIT//IGNORE', (string)($s ?? ''));
+}
+
+// â”€â”€ Custom FPDF class â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+class StudentPDF extends FPDF {
+
+    public $studentName = '';
+    public $regNo       = '';
+
+    // Palette
+    private $cNavy  = [26,  54,  93];
+    private $cTeal  = [0,  119, 130];
+    private $cLight = [237, 245, 250];
+    private $cRule  = [180, 200, 215];
+    private $cBody  = [40,  40,  40];
+
+    function Header() {
+        // Navy bar
+        $this->SetFillColor(26, 54, 93);
+        $this->Rect(0, 0, 210, 20, 'F');
+
+        $this->SetTextColor(170, 200, 230);
+        $this->SetFont('Helvetica', '', 7.5);
+        $this->SetXY(12, 5);
+        $this->Cell(90, 5, 'CAMPUS PLACEMENT MANAGEMENT SYSTEM', 0, 0, 'L');
+
+        $this->SetTextColor(255, 255, 255);
+        $this->SetFont('Helvetica', 'B', 8.5);
+        $this->SetXY(100, 4);
+        $this->Cell(98, 5, safe($this->studentName), 0, 0, 'R');
+
+        $this->SetFont('Helvetica', '', 7);
+        $this->SetTextColor(170, 200, 230);
+        $this->SetXY(100, 10);
+        $this->Cell(98, 5, safe($this->regNo), 0, 0, 'R');
+
+        $this->SetY(24);
+    }
+
+    function Footer() {
+        $this->SetY(-13);
+        $this->SetDrawColor(0, 119, 130);
+        $this->SetLineWidth(0.35);
+        $this->Line(12, $this->GetY(), 198, $this->GetY());
+        $this->Ln(1.5);
+        $this->SetFont('Helvetica', 'I', 7);
+        $this->SetTextColor(130, 130, 130);
+        $this->Cell(93, 5, 'Generated: '.date('d M Y, H:i'), 0, 0, 'L');
+        $this->Cell(93, 5, 'Page '.$this->PageNo().' / {nb}', 0, 0, 'R');
+    }
+
+    function SectionHead($title) {
+        $this->Ln(4);
+        $this->SetFillColor(0, 119, 130);
+        $this->SetTextColor(255, 255, 255);
+        $this->SetFont('Helvetica', 'B', 9);
+        $this->Cell(0, 6.5, '   '.strtoupper($title), 0, 1, 'L', true);
+        $this->SetTextColor(40, 40, 40);
+        $this->Ln(1);
+    }
+
+    function KVRow($label, $value, $shade = false) {
+        if ($shade) $this->SetFillColor(237, 245, 250);
+        else        $this->SetFillColor(255, 255, 255);
+        $this->SetFont('Helvetica', 'B', 8);
+        $this->SetTextColor(80, 80, 80);
+        $this->Cell(44, 6, safe($label), 0, 0, 'L', true);
+        $this->SetFont('Helvetica', '', 8);
+        $this->SetTextColor(40, 40, 40);
+        $this->Cell(0, 6, safe($value), 0, 1, 'L', true);
+    }
+
+    function KVMulti($label, $value, $shade = false) {
+        if ($shade) $this->SetFillColor(237, 245, 250);
+        else        $this->SetFillColor(255, 255, 255);
+        $this->SetFont('Helvetica', 'B', 8);
+        $this->SetTextColor(80, 80, 80);
+        $this->Cell(44, 6, safe($label), 0, 0, 'L', true);
+        $this->SetFont('Helvetica', '', 8);
+        $this->SetTextColor(40, 40, 40);
+        $this->MultiCell(0, 5.5, safe($value), 0, 'L', true);
+        $this->Ln(0.5);
+    }
+
+    function Rule() {
+        $this->SetDrawColor(180, 200, 215);
+        $this->SetLineWidth(0.2);
+        $this->Line(12, $this->GetY(), 198, $this->GetY());
+        $this->Ln(2);
+    }
+
+    function SubHead($title) {
+        $this->SetFillColor(245, 250, 252);
+        $this->SetTextColor(0, 90, 110);
+        $this->SetFont('Helvetica', 'B', 8.5);
+        $this->Cell(0, 6, safe('  '.$title), 0, 1, 'L', true);
+        $this->SetTextColor(40, 40, 40);
+    }
+
+    function Badge($text, $r, $g, $b) {
+        $this->SetFillColor($r, $g, $b);
+        $this->SetTextColor(255, 255, 255);
+        $this->SetFont('Helvetica', 'B', 7);
+        $w = $this->GetStringWidth($text) + 7;
+        $this->Cell($w, 5, safe($text), 0, 0, 'C', true);
+        $this->SetTextColor(40, 40, 40);
+    }
+
+    function SkillChips($title, $arr) {
+        if (empty($arr)) return;
+        if ($title) {
+            $this->SetFont('Helvetica', 'B', 8);
+            $this->SetTextColor(60, 60, 60);
+            $this->Cell(0, 5.5, safe($title), 0, 1);
+        }
+        $x0 = 12; $y = $this->GetY(); $x = $x0; $lineH = 6.5;
+        foreach ($arr as $chip) {
+            $chip = safe($chip);
+            $w = $this->GetStringWidth($chip) + 7;
+            if ($x + $w > 196) { $x = $x0; $y += $lineH; }
+            $this->SetXY($x, $y);
+            $this->SetFillColor(228, 245, 248);
+            $this->SetDrawColor(0, 119, 130);
+            $this->SetLineWidth(0.2);
+            $this->SetTextColor(0, 80, 95);
+            $this->SetFont('Helvetica', '', 7.5);
+            $this->Cell($w, 5, $chip, 1, 0, 'C', true);
+            $x += $w + 2;
+        }
+        $this->SetXY(12, $y + $lineH);
+        $this->SetTextColor(40, 40, 40);
+        $this->SetDrawColor(0, 0, 0);
+    }
+}
+
+// â”€â”€ Build PDF â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$pdf = new StudentPDF('P', 'mm', 'A4');
+$pdf->AliasNbPages();
+$pdf->SetMargins(12, 24, 12);
+$pdf->SetAutoPageBreak(true, 16);
+$pdf->studentName = $student['name'];
+$pdf->regNo       = $student['reg_no'].' | '.$student['dept_name'];
+$pdf->AddPage();
+
+// â”€â”€ Hero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$pdf->SetFont('Helvetica', 'B', 18);
+$pdf->SetTextColor(26, 54, 93);
+$pdf->Cell(0, 9, safe($student['name']), 0, 1, 'C');
+
+$pdf->SetFont('Helvetica', '', 9);
+$pdf->SetTextColor(100, 100, 100);
+$pdf->Cell(0, 5, safe($student['reg_no'].' Â· '.$student['dept_name']), 0, 1, 'C');
+$pdf->Ln(2.5);
+
+// Badge row â€” centered
+$badges = [];
+$badges[] = ['text' => strtoupper($student['verification_status'] ?? 'PENDING'),
+             'r' => $student['verification_status']==='approved' ? 22  : 220,
+             'g' => $student['verification_status']==='approved' ? 163 : 38,
+             'b' => $student['verification_status']==='approved' ? 74  : 38];
+if (!empty($student['skill_category']))
+    $badges[] = ['text' => strtoupper($student['skill_category']), 'r'=>26,'g'=>54,'b'=>93];
+$badges[] = ['text' => 'CGPA: '.number_format($student['cgpa'], 2), 'r'=>0,'g'=>119,'b'=>130];
+if ($student['backlogs'] == 0)
+    $badges[] = ['text' => 'NO BACKLOGS', 'r'=>22,'g'=>163,'b'=>74];
+
+// Calculate total width for centering
+$totalW = 0;
+foreach ($badges as $b) {
+    $pdf->SetFont('Helvetica', 'B', 7);
+    $totalW += $pdf->GetStringWidth($b['text']) + 7 + 4; // chip + gap
+}
+$pdf->SetX((210 - $totalW) / 2);
+foreach ($badges as $b) {
+    $pdf->Badge($b['text'], $b['r'], $b['g'], $b['b']);
+    $pdf->SetX($pdf->GetX() + 4);
+}
+$pdf->Ln(7);
+
+$pdf->SetDrawColor(0, 119, 130);
+$pdf->SetLineWidth(0.5);
+$pdf->Line(12, $pdf->GetY(), 198, $pdf->GetY());
+$pdf->Ln(3);
+
+// â”€â”€ PERSONAL INFORMATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$pdf->SectionHead('Personal Information');
+$shade = false;
+$pdf->KVRow('Full Name',        $student['name'],                                                $shade); $shade=!$shade;
+$pdf->KVRow('Registration No',  $student['reg_no'],                                              $shade); $shade=!$shade;
+$pdf->KVRow('Department',       $student['dept_name'],                                           $shade); $shade=!$shade;
+$pdf->KVRow('Email',            $student['email'],                                               $shade); $shade=!$shade;
+$pdf->KVRow('Phone',            $student['phone'] ?? 'N/A',                                      $shade); $shade=!$shade;
+$pdf->KVRow('Date of Birth',    $student['dob'] ? date('d M Y', strtotime($student['dob'])) : 'N/A', $shade); $shade=!$shade;
+$pdf->KVMulti('Address',        $student['address'] ?? 'N/A',                                   $shade);
+
+// â”€â”€ ACADEMIC INFORMATION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+$pdf->SectionHead('Academic Information');
+$shade = false;
+$pdf->KVRow('Current CGPA',     number_format($student['cgpa'], 2),                             $shade); $shade=!$shade;
+$pdf->KVRow('Average CGPA',     $averageCgpa ? number_format($averageCgpa, 2) : 'N/A',          $shade); $shade=!$shade;
+$pdf->KVRow('Current Semester', 'Semester '.$student['current_semester'],                        $shade); $shade=!$shade;
+$pdf->KVRow('Batch',            $student['batch_year'] ? $student['batch_year'].' - '.($student['batch_year']+4) : 'N/A', $shade); $shade=!$shade;
+$pdf->KVRow('Backlogs',         'Current: '.($student['backlogs']??0).'   |   Cleared: '.($student['cleared_backlogs']??0), $shade); $shade=!$shade;
+$pdf->KVRow('10th Percentage',  $student['tenth_percentage']   ? number_format($student['tenth_percentage'],2).'%' : 'N/A', $shade); $shade=!$shade;
+$pdf->KVRow('12th Percentage',  $student['twelfth_percentage'] ? number_format($student['twelfth_percentage'],2).'%' : 'N/A', $shade); $shade=!$shade;
+$pdf->KVRow('School',           $student['school_name'] ?? 'N/A',                               $shade); $shade=!$shade;
+$pdf->KVRow('Verification',     ucfirst($student['verification_status'] ?? 'pending'),           $shade);
+
+// Semester CGPA â€” 2-column progress bars
+$semData = [];
+for ($i = 1; $i <= 8; $i++) {
+    if (!empty($student['cgpa_sem'.$i])) $semData[$i] = (float)$student['cgpa_sem'.$i];
+}
+if (!empty($semData)) {
+    $pdf->Ln(3);
+    $pdf->SetFont('Helvetica', 'B', 8.5);
+    $pdf->SetTextColor(60, 60, 60);
+    $pdf->Cell(0, 5, 'Semester-wise CGPA', 0, 1);
+    $pdf->Ln(1);
+
+    $keys = array_keys($semData);
+    $mid  = (int)ceil(count($keys) / 2);
+    $left = array_slice($keys, 0, $mid);
+    $right= array_slice($keys, $mid);
+    $maxR = max(count($left), count($right));
+
+    for ($r = 0; $r < $maxR; $r++) {
+        // Left col
+        $pdf->SetX(12);
+        if (isset($left[$r])) {
+            $s = $left[$r]; $v = $semData[$s];
+            $pdf->SetFont('Helvetica', '', 7.5); $pdf->SetTextColor(80,80,80);
+            $pdf->Cell(14, 5, 'Sem '.$s.':', 0, 0);
+            $bw=52; $filled=($v/10)*$bw; $x=$pdf->GetX(); $y=$pdf->GetY()+1;
+            $pdf->SetFillColor(215,235,240); $pdf->Rect($x,$y,$bw,3,'F');
+            $pdf->SetFillColor(0,119,130);   if($filled>0) $pdf->Rect($x,$y,$filled,3,'F');
+            $pdf->SetX($x+$bw+2);
+            $pdf->SetFont('Helvetica','B',7.5); $pdf->SetTextColor(0,119,130);
+            $pdf->Cell(10, 5, number_format($v,2), 0, 0);
+        }
+        // Right col
+        $pdf->SetX(108);
+        if (isset($right[$r])) {
+            $s = $right[$r]; $v = $semData[$s];
+            $pdf->SetFont('Helvetica', '', 7.5); $pdf->SetTextColor(80,80,80);
+            $pdf->Cell(14, 5, 'Sem '.$s.':', 0, 0);
+            $bw=52; $filled=($v/10)*$bw; $x=$pdf->GetX(); $y=$pdf->GetY()+1;
+            $pdf->SetFillColor(215,235,240); $pdf->Rect($x,$y,$bw,3,'F');
+            $pdf->SetFillColor(0,119,130);   if($filled>0) $pdf->Rect($x,$y,$filled,3,'F');
+            $pdf->SetX($x+$bw+2);
+            $pdf->SetFont('Helvetica','B',7.5); $pdf->SetTextColor(0,119,130);
+            $pdf->Cell(10, 5, number_format($v,2), 0, 1);
+        } else {
+            $pdf->Ln(5);
+        }
+    }
+    $pdf->SetTextColor(40,40,40);
+}
+
+// â”€â”€ PROFESSIONAL LINKS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if ($student['github_link'] || $student['linkedin_link'] || $student['hackerrank_score']) {
+    $pdf->SectionHead('Professional Links & Scores');
+    $shade = false;
+    if ($student['github_link'])      { $pdf->KVRow('GitHub',           $student['github_link'],                 $shade); $shade=!$shade; }
+    if ($student['linkedin_link'])    { $pdf->KVRow('LinkedIn',         $student['linkedin_link'],               $shade); $shade=!$shade; }
+    if ($student['hackerrank_score']) { $pdf->KVRow('HackerRank Score', number_format($student['hackerrank_score']), $shade); }
+}
+
+// â”€â”€ SKILLS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if (!empty($skills)) {
+    $pdf->SectionHead('Skills & Competencies');
+    $tech = []; $soft = [];
+    foreach ($skills as $sk) {
+        $entry = $sk['skill_name'].' ('.ucfirst($sk['proficiency_level']).')';
+        if ($sk['skill_type'] === 'technical') $tech[] = $entry; else $soft[] = $entry;
+    }
+    if (!empty($tech)) { $pdf->SkillChips('Technical Skills', $tech); $pdf->Ln(2); }
+    if (!empty($soft)) { $pdf->SkillChips('Soft Skills',      $soft); $pdf->Ln(2); }
+}
+
+// â”€â”€ AREAS OF INTEREST â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if (!empty($interests)) {
+    $pdf->SectionHead('Areas of Interest');
+    $items = [];
+    foreach ($interests as $in) {
+        $v = $in['interest_name'] ?? $in['area'] ?? '';
+        if ($v) $items[] = $v;
+    }
+    if (!empty($items)) { $pdf->SkillChips('', $items); $pdf->Ln(2); }
+}
+
+// â”€â”€ INTERNSHIPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if (!empty($internships)) {
+    $pdf->SectionHead('Internships & Work Experience');
+    foreach ($internships as $idx => $int) {
+        if ($idx > 0) $pdf->Rule();
+        $pdf->SubHead(($idx+1).'.  '.$int['company_name'].' â€” '.($int['role'] ?? ''));
+        $shade = false;
+        $pdf->KVRow('Company',      $int['company_name'],                                        $shade); $shade=!$shade;
+        $pdf->KVRow('Role',         $int['role'],                                                $shade); $shade=!$shade;
+        $pdf->KVRow('Duration',     $int['duration'],                                            $shade); $shade=!$shade;
+        if ($int['start_date'] && $int['end_date']) {
+            $pdf->KVRow('Period', date('M Y',strtotime($int['start_date'])).' to '.date('M Y',strtotime($int['end_date'])), $shade); $shade=!$shade;
+        }
+        if ($int['stipend'])             { $pdf->KVRow('Stipend',       'Rs. '.number_format($int['stipend']), $shade); $shade=!$shade; }
+        if ($int['project_title'])       { $pdf->KVRow('Project Title', $int['project_title'],                $shade); $shade=!$shade; }
+        if ($int['technologies_used'])   { $pdf->KVRow('Technologies',  $int['technologies_used'],            $shade); $shade=!$shade; }
+        if ($int['project_description']) { $pdf->KVMulti('Description', $int['project_description'],          $shade); }
+        $pdf->Ln(2);
+    }
+}
+
+// â”€â”€ PROJECTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if (!empty($projects)) {
+    $pdf->SectionHead('Personal Projects');
+    foreach ($projects as $idx => $proj) {
+        if ($idx > 0) $pdf->Rule();
+        $pdf->SubHead(($idx+1).'.  '.($proj['project_title'] ?? 'Project'));
+        $shade = false;
+        $pdf->KVRow('Title',        $proj['project_title'],                                      $shade); $shade=!$shade;
+        if ($proj['start_date'] && $proj['end_date']) {
+            $pdf->KVRow('Period', date('M Y',strtotime($proj['start_date'])).' to '.date('M Y',strtotime($proj['end_date'])), $shade); $shade=!$shade;
+        }
+        if ($proj['technologies_used'])   { $pdf->KVRow('Technologies',  $proj['technologies_used'],  $shade); $shade=!$shade; }
+        if ($proj['project_link'])        { $pdf->KVRow('Link',          $proj['project_link'],        $shade); $shade=!$shade; }
+        if ($proj['project_description']) { $pdf->KVMulti('Description', $proj['project_description'], $shade); }
+        $pdf->Ln(2);
+    }
+}
+
+// â”€â”€ PLACEMENT APPLICATIONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+if (!empty($applications)) {
+    $pdf->SectionHead('Placement Applications');
+
+    // Table header
+    $pdf->SetFillColor(26, 54, 93);
+    $pdf->SetTextColor(255, 255, 255);
+    $pdf->SetFont('Helvetica', 'B', 7.5);
+    $pdf->Cell(54, 6.5, 'Company',    0, 0, 'C', true);
+    $pdf->Cell(28, 6.5, 'Drive Date', 0, 0, 'C', true);
+    $pdf->Cell(28, 6.5, 'Applied On', 0, 0, 'C', true);
+    $pdf->Cell(26, 6.5, 'Round 1',   0, 0, 'C', true);
+    $pdf->Cell(26, 6.5, 'Round 2',   0, 0, 'C', true);
+    $pdf->Cell(24, 6.5, 'Final',     0, 1, 'C', true);
+    $pdf->SetTextColor(40, 40, 40);
+
+    foreach ($applications as $i => $app) {
+        if ($i % 2 === 0) $pdf->SetFillColor(237, 245, 250);
+        else              $pdf->SetFillColor(255, 255, 255);
+        $pdf->SetFont('Helvetica', 'B', 7.5);
+        $pdf->Cell(54, 5.5, safe($app['company_name']),                         0, 0, 'L', true);
+        $pdf->SetFont('Helvetica', '', 7.5);
+        $pdf->Cell(28, 5.5, date('d M Y',strtotime($app['drive_date'])),        0, 0, 'C', true);
+        $pdf->Cell(28, 5.5, date('d M Y',strtotime($app['applied_at'])),        0, 0, 'C', true);
+        $pdf->Cell(26, 5.5, ucfirst($app['round1_status'] ?? '-'),              0, 0, 'C', true);
+        $pdf->Cell(26, 5.5, ucfirst($app['round2_status'] ?? '-'),              0, 0, 'C', true);
+        $pdf->Cell(24, 5.5, ucfirst($app['final_status']  ?? 'Pending'),        0, 1, 'C', true);
+    }
+    $pdf->Ln(2);
+}
+
+// â”€â”€ Output â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+try {
+    if (ob_get_length()) ob_clean();
+    $safeName = preg_replace('/[^a-zA-Z0-9]/', '_', trim($student['name'] ?? 'student'));
+    $safeReg  = preg_replace('/[^a-zA-Z0-9]/', '_', trim($student['reg_no']  ?? ''));
+    $fileName = trim($safeName.($safeReg ? '_'.$safeReg : '').'_profile.pdf', '_');
+    header('Content-Type: application/pdf');
+    header('Content-Disposition: attachment; filename="'.$fileName.'"');
+    header('Cache-Control: private, max-age=0, must-revalidate');
+    header('Pragma: public');
+    $pdf->Output('D', $fileName);
+    exit;
+} catch (Exception $e) {
+    echo "Error: ".$e->getMessage(); exit;
+}
+?>
+

@@ -1,0 +1,510 @@
+/* ================================================================
+   CAMPUSS — UNIFIED MODULE STYLES
+   Applies the same design language to Student, Staff & Admin.
+   File: /campuss/css/all-modules.css
+   ================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+/* ── SHARED TOKEN OVERRIDES ─────────────────────────────────── */
+:root {
+  --c-bg:       #f0f4ff;
+  --c-white:    #ffffff;
+  --c-border:   #e2e8f0;
+  --c-border-h: #93c5fd;
+  --c-text:     #1e293b;
+  --c-muted:    #64748b;
+  --c-radius:   18px;
+  --c-shadow:   0 2px 16px rgba(30,58,138,0.06);
+  --c-shadow-h: 0 10px 36px rgba(37,99,235,0.12);
+
+  /* student = blue */
+  --s-1: #2563eb; --s-2: #1d4ed8; --s-grad: linear-gradient(135deg,#2563eb,#1d4ed8);
+  /* staff   = purple */
+  --t-1: #7c3aed; --t-2: #6d28d9; --t-grad: linear-gradient(135deg,#7c3aed,#6d28d9);
+  /* admin   = indigo */
+  --a-1: #4f46e5; --a-2: #4338ca; --a-grad: linear-gradient(135deg,#4f46e5,#4338ca);
+}
+
+/* ================================================================
+   PAGE WRAPPERS  (student / staff / admin)
+   ================================================================ */
+.stud-page, .staff-page, .admin-page {
+  margin-left: 255px !important;
+  min-height: 100vh !important;
+  padding: 2rem 2.2rem 3rem !important;
+  background: var(--c-bg) !important;
+  font-family: 'Poppins', 'Segoe UI', sans-serif !important;
+  /* strip old styles */
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
+.stud-container, .staff-container, .admin-container {
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* ── DARK MODE ──────────────────────────────────────────────── */
+body.dark-mode .stud-page,
+body.dark-mode .staff-page,
+body.dark-mode .admin-page {
+  background: #080f20 !important;
+  color: #e2e8f0 !important;
+}
+
+/* ================================================================
+   PAGE HEADERS
+   ================================================================ */
+/* student */
+.stud-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.8rem; gap:1.5rem; animation: hdrIn .5s ease-out; }
+.stud-welcome h1 { font-size:1.9rem; font-weight:900; line-height:1.2; margin-bottom:.3rem;
+  background: linear-gradient(135deg,#1e3a8a,#2563eb,#0891b2);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.stud-welcome p { color:var(--c-muted); font-size:.9rem; font-weight:500; }
+
+/* staff */
+.staff-header { margin-bottom:1.8rem; animation: hdrIn .5s ease-out; }
+.staff-header h1 { font-size:1.9rem; font-weight:900; line-height:1.2; margin-bottom:.3rem;
+  background: linear-gradient(135deg,#5b21b6,#7c3aed,#0ea5e9);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.staff-header p { color:var(--c-muted); font-size:.9rem; font-weight:500; }
+
+/* admin */
+.admin-header { margin-bottom:1.8rem; animation: hdrIn .5s ease-out; }
+.admin-header h1 { font-size:1.9rem; font-weight:900; line-height:1.2; margin-bottom:.3rem;
+  background: linear-gradient(135deg,#312e81,#4f46e5,#7c3aed);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+.admin-header p { color:var(--c-muted); font-size:.9rem; font-weight:500; }
+
+@keyframes hdrIn {
+  from { opacity:0; transform:translateY(-10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Account-status badge (student) */
+.stud-status {
+  background: linear-gradient(135deg,rgba(37,99,235,.07),rgba(8,145,178,.07)) !important;
+  border: 1.5px solid rgba(37,99,235,.18) !important;
+  border-radius: 14px !important;
+  padding: .9rem 1.4rem !important;
+  text-align: center !important; min-width: 140px !important;
+}
+.stud-status-label { font-size:.72rem; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:.8px; margin-bottom:.3rem; }
+.stud-status-badge { font-size:.95rem; font-weight:800; color:#16a34a; }
+
+/* ================================================================
+   STAT CARDS
+   ================================================================ */
+.stud-stats, .staff-stats, .admin-stats {
+  display: grid !important;
+  grid-template-columns: repeat(4,1fr) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 1.8rem !important;
+}
+
+.stud-stat, .staff-stat, .admin-stat {
+  border-radius: 18px !important;
+  padding: 1.6rem 1.3rem !important;
+  text-align: center !important;
+  position: relative !important;
+  overflow: hidden !important;
+  border: none !important;
+  cursor: default !important;
+  transition: transform .25s cubic-bezier(.4,0,.2,1), box-shadow .25s ease !important;
+  animation: cardPop .55s ease-out backwards !important;
+}
+
+/* Decorative orb */
+.stud-stat::after, .staff-stat::after, .admin-stat::after {
+  content:''; position:absolute; top:-20px; right:-20px;
+  width:85px; height:85px; border-radius:50%;
+  background:rgba(255,255,255,0.13); pointer-events:none;
+}
+
+.stud-stat:hover, .staff-stat:hover, .admin-stat:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 22px 48px rgba(0,0,0,0.2) !important;
+}
+
+@keyframes cardPop {
+  from { opacity:0; transform:translateY(16px) scale(.95); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+/* ── STUDENT STAT COLOURS ── */
+.stud-stats .stud-stat:nth-child(1) { background:linear-gradient(135deg,#2563eb,#1d4ed8)!important; box-shadow:0 8px 24px rgba(37,99,235,.38)!important; animation-delay:.05s!important; }
+.stud-stats .stud-stat:nth-child(2) { background:linear-gradient(135deg,#0ea5e9,#0891b2)!important; box-shadow:0 8px 24px rgba(14,165,233,.38)!important; animation-delay:.10s!important; }
+.stud-stats .stud-stat:nth-child(3) { background:linear-gradient(135deg,#f59e0b,#d97706)!important; box-shadow:0 8px 24px rgba(245,158,11,.38)!important; animation-delay:.15s!important; }
+.stud-stats .stud-stat:nth-child(4) { background:linear-gradient(135deg,#8b5cf6,#7c3aed)!important; box-shadow:0 8px 24px rgba(139,92,246,.38)!important; animation-delay:.20s!important; }
+
+/* ── STAFF STAT COLOURS ── */
+.staff-stats .staff-stat:nth-child(1) { background:linear-gradient(135deg,#7c3aed,#6d28d9)!important; box-shadow:0 8px 24px rgba(124,58,237,.38)!important; animation-delay:.05s!important; }
+.staff-stats .staff-stat:nth-child(2) { background:linear-gradient(135deg,#0ea5e9,#0284c7)!important; box-shadow:0 8px 24px rgba(14,165,233,.38)!important; animation-delay:.10s!important; }
+.staff-stats .staff-stat:nth-child(3) { background:linear-gradient(135deg,#10b981,#059669)!important; box-shadow:0 8px 24px rgba(16,185,129,.38)!important; animation-delay:.15s!important; }
+.staff-stats .staff-stat:nth-child(4) { background:linear-gradient(135deg,#f59e0b,#d97706)!important; box-shadow:0 8px 24px rgba(245,158,11,.38)!important; animation-delay:.20s!important; }
+
+/* ── ADMIN STAT COLOURS ── */
+.admin-stats .admin-stat:nth-child(1) { background:linear-gradient(135deg,#4f46e5,#4338ca)!important; box-shadow:0 8px 24px rgba(79,70,229,.38)!important; animation-delay:.05s!important; }
+.admin-stats .admin-stat:nth-child(2) { background:linear-gradient(135deg,#0ea5e9,#0891b2)!important; box-shadow:0 8px 24px rgba(14,165,233,.38)!important; animation-delay:.10s!important; }
+.admin-stats .admin-stat:nth-child(3) { background:linear-gradient(135deg,#10b981,#059669)!important; box-shadow:0 8px 24px rgba(16,185,129,.38)!important; animation-delay:.15s!important; }
+.admin-stats .admin-stat:nth-child(4) { background:linear-gradient(135deg,#ef4444,#dc2626)!important; box-shadow:0 8px 24px rgba(239,68,68,.38)!important; animation-delay:.20s!important; }
+.admin-stats .admin-stat:nth-child(5) { background:linear-gradient(135deg,#f59e0b,#d97706)!important; box-shadow:0 8px 24px rgba(245,158,11,.38)!important; animation-delay:.25s!important; }
+.admin-stats .admin-stat:nth-child(6) { background:linear-gradient(135deg,#8b5cf6,#7c3aed)!important; box-shadow:0 8px 24px rgba(139,92,246,.38)!important; animation-delay:.30s!important; }
+
+/* Shared stat text */
+.stud-stat-num, .staff-stat-num, .admin-stat-num {
+  font-size: 2.4rem !important; font-weight: 900 !important;
+  color: #fff !important; line-height: 1 !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,.15) !important;
+  position: relative !important; z-index: 1 !important;
+}
+
+.stud-stat-label, .staff-stat-label, .admin-stat-label {
+  font-size: .8rem !important; font-weight: 600 !important;
+  color: rgba(255,255,255,.88) !important;
+  margin-top: .55rem !important; letter-spacing: .3px !important;
+  position: relative !important; z-index: 1 !important;
+}
+
+/* ================================================================
+   CARDS
+   ================================================================ */
+.stud-card, .staff-card, .admin-card {
+  background: #fff !important;
+  border: 1.5px solid var(--c-border) !important;
+  border-radius: var(--c-radius) !important;
+  padding: 1.8rem 2rem !important;
+  margin-bottom: 1.5rem !important;
+  box-shadow: var(--c-shadow) !important;
+  transition: box-shadow .25s ease, border-color .25s ease, transform .2s ease !important;
+  animation: slideUp .5s ease-out backwards !important;
+}
+
+.stud-card:hover, .staff-card:hover, .admin-card:hover {
+  border-color: var(--c-border-h) !important;
+  box-shadow: var(--c-shadow-h) !important;
+  transform: translateY(-2px) !important;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Card titles */
+.stud-card-title, .staff-card-title, .admin-card-title {
+  font-size: 1.1rem !important; font-weight: 800 !important;
+  margin-bottom: 1.2rem !important;
+  padding-bottom: .8rem !important;
+  border-bottom: 2px solid #f1f5f9 !important;
+  display: flex !important; align-items: center !important; gap: .5rem !important;
+}
+
+.stud-card-title  { color: #1e3a8a !important; }
+.staff-card-title { color: #5b21b6 !important; }
+.admin-card-title { color: #312e81 !important; }
+
+/* Dark mode cards */
+body.dark-mode .stud-card,
+body.dark-mode .staff-card,
+body.dark-mode .admin-card {
+  background: #0f1e3a !important;
+  border-color: #1e3a5f !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,.4) !important;
+}
+body.dark-mode .stud-card-title  { color: #93c5fd !important; }
+body.dark-mode .staff-card-title { color: #c4b5fd !important; }
+body.dark-mode .admin-card-title { color: #a5b4fc !important; }
+
+/* ================================================================
+   BUTTONS — SHINE EFFECT
+   ================================================================ */
+.stud-btn, .staff-btn, .admin-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: .4rem !important;
+  padding: .65rem 1.45rem !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: .87rem !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  transition: all .25s cubic-bezier(.4,0,.2,1) !important;
+  margin-right: .6rem !important;
+  margin-top: .75rem !important;
+  position: relative !important;
+  overflow: hidden !important;
+  letter-spacing: .2px !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+/* Shine sweep */
+.stud-btn::after, .staff-btn::after, .admin-btn::after {
+  content: '' !important;
+  position: absolute !important; top:0 !important; left:-100% !important;
+  width: 60% !important; height: 100% !important;
+  background: linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent) !important;
+  transform: skewX(-18deg) !important;
+  transition: left .45s ease !important;
+}
+
+.stud-btn:hover::after,
+.staff-btn:hover::after,
+.admin-btn:hover::after { left: 150% !important; }
+
+.stud-btn:hover, .staff-btn:hover, .admin-btn:hover {
+  transform: translateY(-3px) !important;
+}
+
+.stud-btn:active, .staff-btn:active, .admin-btn:active {
+  transform: translateY(0) scale(.97) !important;
+}
+
+/* Module-specific button colors */
+.stud-btn {
+  background: linear-gradient(135deg,#2563eb,#0891b2) !important;
+  box-shadow: 0 4px 14px rgba(37,99,235,.32) !important;
+}
+.stud-btn:hover {
+  background: linear-gradient(135deg,#1d4ed8,#0e7490) !important;
+  box-shadow: 0 12px 28px rgba(37,99,235,.42) !important;
+}
+
+.staff-btn {
+  background: linear-gradient(135deg,#7c3aed,#0ea5e9) !important;
+  box-shadow: 0 4px 14px rgba(124,58,237,.32) !important;
+}
+.staff-btn:hover {
+  background: linear-gradient(135deg,#6d28d9,#0284c7) !important;
+  box-shadow: 0 12px 28px rgba(124,58,237,.42) !important;
+}
+
+.admin-btn {
+  background: linear-gradient(135deg,#4f46e5,#7c3aed) !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,.32) !important;
+}
+.admin-btn:hover {
+  background: linear-gradient(135deg,#4338ca,#6d28d9) !important;
+  box-shadow: 0 12px 28px rgba(79,70,229,.42) !important;
+}
+
+/* ================================================================
+   TABLES
+   ================================================================ */
+.stud-table, .staff-table, .admin-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: .88rem !important;
+}
+
+.stud-table th, .staff-table th, .admin-table th {
+  padding: .9rem 1rem !important;
+  font-weight: 700 !important;
+  font-size: .76rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .6px !important;
+  border-bottom: 2px solid #dde6f5 !important;
+}
+
+.stud-table th  { background:linear-gradient(135deg,#eff6ff,#f0f9ff)!important; color:#1d4ed8!important; }
+.staff-table th { background:linear-gradient(135deg,#f5f3ff,#ede9fe)!important; color:#6d28d9!important; }
+.admin-table th { background:linear-gradient(135deg,#eef2ff,#e0e7ff)!important; color:#4338ca!important; }
+
+.stud-table td, .staff-table td, .admin-table td {
+  padding: .9rem 1rem !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.stud-table tr:hover td,
+.staff-table tr:hover td,
+.admin-table tr:hover td {
+  background: #f8fbff !important;
+}
+
+body.dark-mode .stud-table th,
+body.dark-mode .staff-table th,
+body.dark-mode .admin-table th {
+  background: #0f1e3a !important; border-color:#1e3a5f!important;
+}
+body.dark-mode .stud-table td,
+body.dark-mode .staff-table td,
+body.dark-mode .admin-table td {
+  color:#94a3b8!important; border-color:#1e3a5f!important;
+}
+
+/* ================================================================
+   BADGES
+   ================================================================ */
+.stud-badge, .staff-badge, .admin-badge {
+  display: inline-flex !important; align-items: center !important;
+  padding: .28rem .72rem !important;
+  border-radius: 8px !important;
+  font-size: .76rem !important; font-weight: 700 !important;
+  letter-spacing: .2px !important;
+}
+
+.stud-badge-success, .staff-badge-success, .admin-badge-success {
+  background:rgba(34,197,94,.11)!important; color:#16a34a!important;
+  border:1px solid rgba(34,197,94,.2)!important;
+}
+.stud-badge-danger, .staff-badge-danger, .admin-badge-danger {
+  background:rgba(239,68,68,.1)!important; color:#dc2626!important;
+  border:1px solid rgba(239,68,68,.2)!important;
+}
+.stud-badge-warning, .staff-badge-warning, .admin-badge-warning {
+  background:rgba(245,158,11,.1)!important; color:#d97706!important;
+  border:1px solid rgba(245,158,11,.2)!important;
+}
+.stud-badge-secondary, .staff-badge-secondary, .admin-badge-secondary {
+  background:rgba(100,116,139,.1)!important; color:#64748b!important;
+  border:1px solid rgba(100,116,139,.15)!important;
+}
+.admin-badge-primary {
+  background:rgba(79,70,229,.1)!important; color:#4338ca!important;
+  border:1px solid rgba(79,70,229,.2)!important;
+}
+
+/* ================================================================
+   DETAIL / INFO GRIDS
+   ================================================================ */
+.stud-details, .staff-details, .admin-details {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit,minmax(220px,1fr)) !important;
+  gap: 1.1rem !important;
+}
+
+.stud-detail-item, .staff-detail-item, .admin-detail-item {
+  background: linear-gradient(135deg,#f8faff,#f0f4ff) !important;
+  border: 1px solid #dde6f5 !important;
+  border-radius: 13px !important;
+  padding: 1.1rem 1.2rem !important;
+  transition: border-color .2s ease, transform .2s ease !important;
+}
+
+.stud-detail-item:hover,
+.staff-detail-item:hover,
+.admin-detail-item:hover {
+  border-color: var(--c-border-h) !important;
+  transform: translateY(-2px) !important;
+}
+
+.stud-detail-label, .staff-detail-label, .admin-detail-label {
+  font-size: .72rem !important; color: #94a3b8 !important;
+  font-weight: 700 !important; text-transform: uppercase !important;
+  letter-spacing: .7px !important; margin-bottom: .35rem !important;
+}
+
+.stud-detail-value  { color:#1e3a8a!important; font-size:.98rem!important; font-weight:700!important; }
+.staff-detail-value { color:#5b21b6!important; font-size:.98rem!important; font-weight:700!important; }
+.admin-detail-value { color:#312e81!important; font-size:.98rem!important; font-weight:700!important; }
+
+/* ================================================================
+   ANNOUNCEMENTS / ALERTS
+   ================================================================ */
+.stud-ann-item, .staff-ann-item {
+  background: linear-gradient(135deg,#f8faff,#f0f9ff) !important;
+  border-radius: 0 12px 12px 0 !important;
+  padding: 1.1rem 1.3rem !important;
+  margin-bottom: .85rem !important;
+  transition: transform .2s ease, box-shadow .2s ease !important;
+}
+
+.stud-ann-item  { border-left:4px solid #2563eb!important; }
+.staff-ann-item { border-left:4px solid #7c3aed!important; }
+
+.stud-ann-item:hover, .staff-ann-item:hover {
+  transform: translateX(5px) !important;
+  box-shadow: 0 4px 16px rgba(37,99,235,.1) !important;
+}
+
+.stud-alert, .staff-alert {
+  background: rgba(245,158,11,.07) !important;
+  border: 1.5px solid rgba(245,158,11,.2) !important;
+  border-radius: 13px !important;
+  padding: 1.2rem 1.4rem !important;
+  margin-bottom: 1.5rem !important;
+  color: #b45309 !important; font-weight: 500 !important;
+}
+
+/* ================================================================
+   ADMIN GRID (department breakdown etc)
+   ================================================================ */
+.admin-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit,minmax(200px,1fr)) !important;
+  gap: 1.1rem !important; margin-bottom:1.5rem !important;
+}
+
+.admin-grid-item {
+  background: linear-gradient(135deg,#eef2ff,#e0e7ff) !important;
+  border: 1.5px solid rgba(79,70,229,.15) !important;
+  border-radius: 14px !important;
+  padding: 1.4rem !important;
+  text-align: center !important;
+  transition: transform .2s ease, border-color .2s ease !important;
+}
+
+.admin-grid-item:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(79,70,229,.4) !important;
+}
+
+.admin-grid-item > div:first-child {
+  font-size: 1.8rem !important; font-weight: 900 !important;
+  color: #4338ca !important; margin-bottom: .5rem !important;
+}
+
+.admin-grid-item > div:last-child {
+  font-size: .83rem !important; color: var(--c-muted) !important;
+}
+
+/* Skeleton loader for cards */
+.skeleton {
+  background: linear-gradient(90deg, #f3f3f3 25%, #ececec 37%, #f3f3f3 63%);
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: 12px;
+  min-height: 1.5em;
+}
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* Card tilt effect */
+.tilt-card {
+  transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s;
+  will-change: transform;
+  box-shadow: 0 4px 24px rgba(59,130,246,0.07);
+}
+.tilt-card:hover {
+  box-shadow: 0 20px 50px rgba(59, 130, 246, 0.13);
+}
+
+/* Parallax background for login */
+.login-bg-parallax {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('../uploads/clg.jpg') center/cover no-repeat fixed;
+  will-change: background-position;
+  transition: background-position 0.3s;
+}
+
+/* Smooth dark mode transition */
+body, .sidebar, .login-card, .stud-card {
+  transition: background 0.4s cubic-bezier(.4,0,.2,1), color 0.4s cubic-bezier(.4,0,.2,1), box-shadow 0.4s;
+}
+
+/* GSAP animation utility classes */
+.gsap-animate {
+  opacity: 0;
+  will-change: opacity, transform;
+}

@@ -1,0 +1,1161 @@
+/* ================================================================
+   CAMPUSCONNECT — LAYOUT FIX & MODERN UI ENHANCEMENT
+   Drop this file into /campuss/css/layout-fix.css
+   Add it LAST in includes/header.php after all other CSS links.
+   ================================================================ */
+
+/* ── Google Font (already loaded in header) ─────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+
+/* ================================================================
+   1. ROOT VARIABLES — unified design tokens
+   ================================================================ */
+:root {
+  --sidebar-w: 255px;
+  --primary:   #4f46e5;
+  --primary-2: #6366f1;
+  --accent:    #06b6d4;
+  --success:   #10b981;
+  --danger:    #ef4444;
+  --warning:   #f59e0b;
+  --page-bg:   #f0f2ff;
+  --card-bg:   #ffffff;
+  --border:    #e2e8f0;
+  --text-1:    #0f172a;
+  --text-2:    #475569;
+  --text-3:    #94a3b8;
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 16px rgba(79,70,229,.08), 0 2px 8px rgba(0,0,0,.06);
+  --shadow-lg: 0 12px 40px rgba(79,70,229,.12), 0 4px 16px rgba(0,0,0,.08);
+  --transition: all .25s cubic-bezier(.4,0,.2,1);
+}
+
+/* ================================================================
+   2. BODY & BASE RESET
+   ================================================================ */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: 'Plus Jakarta Sans', 'Poppins', sans-serif !important;
+  background: var(--page-bg) !important;
+  color: var(--text-1) !important;
+  overflow-x: hidden !important;
+}
+
+/* ================================================================
+   3. MASTER LAYOUT — sidebar offset & content area
+   All page wrapper variants unified here (highest specificity).
+   ================================================================ */
+.main-content-wrapper {
+  margin-left: var(--sidebar-w) !important;
+  width: calc(100% - var(--sidebar-w)) !important;
+  min-height: 100vh !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;       /* child pages own their padding */
+}
+
+/* ── Every direct child of main-content-wrapper gets uniform page padding ── */
+.main-content-wrapper > .page-wrapper,
+.main-content-wrapper > .drives-page,
+.main-content-wrapper > .results-page,
+.main-content-wrapper > .lb-page,
+.main-content-wrapper > .apps-page,
+.main-content-wrapper > .stud-page,
+.main-content-wrapper > .staff-page,
+.main-content-wrapper > .admin-page {
+  margin-left: 0 !important;
+  width: 100% !important;
+  min-height: 100vh !important;
+  padding: 2.5rem 2.5rem 4rem !important;
+  background: var(--page-bg) !important;
+  box-sizing: border-box !important;
+}
+
+/* Pages with background image keep it */
+.main-content-wrapper > .page-wrapper {
+  background: transparent !important;
+}
+
+/* Pages that use .container DIRECTLY inside main-content-wrapper
+   (interview_prep, profile, stats, staff-profile, departments,
+    admin-staff, admin-drives, announcements, reports)
+   — give them identical page padding so ALL pages align equally */
+.main-content-wrapper > .container {
+  max-width: 1200px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 2.5rem 2.5rem 4rem !important;
+  box-sizing: border-box !important;
+  min-height: 100vh !important;
+}
+
+/* reports.php has an inline style on .container — override it */
+.main-content-wrapper > .container[style] {
+  padding: 2.5rem 2.5rem 4rem !important;
+  max-width: 1200px !important;
+}
+
+/* Inner named containers inside shell wrappers — zero extra padding */
+.main-content-wrapper > .drives-page  > .drives-container,
+.main-content-wrapper > .results-page > .results-container,
+.main-content-wrapper > .lb-page      > .lb-container,
+.main-content-wrapper > .apps-page    > .apps-container,
+.main-content-wrapper > .stud-page    > .stud-container,
+.main-content-wrapper > .staff-page   > .staff-container,
+.main-content-wrapper > .admin-page   > .admin-container,
+.main-content-wrapper > .page-wrapper > .container,
+.main-content-wrapper .drives-container,
+.main-content-wrapper .results-container,
+.main-content-wrapper .lb-container,
+.main-content-wrapper .apps-container,
+.main-content-wrapper .stud-container,
+.main-content-wrapper .staff-container,
+.main-content-wrapper .admin-container {
+  max-width: 1200px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* ================================================================
+   4. RESPONSIVE — collapse sidebar offset on small screens
+   ================================================================ */
+@media (max-width: 900px) {
+  .main-content-wrapper {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding-top: 0 !important;
+  }
+  .main-content-wrapper > .container {
+    padding: 5rem 1rem 3rem !important;
+  }
+  .main-content-wrapper > .page-wrapper,
+  .main-content-wrapper > .drives-page,
+  .main-content-wrapper > .results-page,
+  .main-content-wrapper > .lb-page,
+  .main-content-wrapper > .apps-page,
+  .main-content-wrapper > .stud-page,
+  .main-content-wrapper > .staff-page,
+  .main-content-wrapper > .admin-page {
+    padding: 1rem 1rem 3rem !important;
+  }
+}
+@media (max-width: 600px) {
+  .main-content-wrapper {
+    padding-top: 4rem !important;
+  }
+}
+
+/* ================================================================
+   5. MODERN PAGE HEADERS
+   ================================================================ */
+.drives-header,
+.results-header,
+.lb-header,
+.page-header-block,
+.stud-header,
+.admin-header {
+  margin-bottom: 2.2rem !important;
+}
+
+.drives-header h1,
+.results-header h1,
+.lb-header h1,
+.stud-header h1,
+.admin-header h1 {
+  font-size: 2rem !important;
+  font-weight: 900 !important;
+  color: var(--text-1) !important;
+  letter-spacing: -.5px !important;
+  margin-bottom: .4rem !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.drives-header p,
+.results-header p,
+.lb-header p,
+.stud-header p {
+  color: var(--text-2) !important;
+  font-size: .95rem !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+/* ================================================================
+   6. DRIVE CARDS — modern glassmorphism elevation
+   ================================================================ */
+.drive-card {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.8rem !important;
+  margin-bottom: 1.4rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.drive-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  opacity: 0;
+  transition: opacity .3s;
+}
+
+.drive-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(79,70,229,.25) !important;
+}
+
+.drive-card:hover::before { opacity: 1; }
+
+/* Drive details grid — always 2-col on desktop, 1-col mobile */
+.drive-details {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+  gap: .9rem !important;
+  margin-bottom: 1.4rem !important;
+}
+
+.detail-item {
+  background: #f8faff !important;
+  border: 1px solid #e8ecf8 !important;
+  border-radius: var(--radius-sm) !important;
+  padding: .9rem 1rem !important;
+}
+
+.detail-label {
+  font-size: .72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .6px !important;
+  color: var(--primary) !important;
+  margin-bottom: .35rem !important;
+}
+
+.detail-value {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--text-1) !important;
+}
+
+/* Status badges */
+.drive-status {
+  padding: .35rem 1rem !important;
+  border-radius: 999px !important;
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .5px !important;
+}
+
+.status-upcoming  { background: rgba(79,70,229,.12) !important; color: var(--primary) !important; border: 1px solid rgba(79,70,229,.2) !important; }
+.status-ongoing   { background: rgba(16,185,129,.12) !important; color: #059669 !important;       border: 1px solid rgba(16,185,129,.2) !important; }
+.status-completed { background: rgba(100,116,139,.12) !important; color: #475569 !important;      border: 1px solid rgba(100,116,139,.2) !important; }
+
+/* Apply button */
+.apply-btn {
+  padding: .75rem 2rem !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 700 !important;
+  font-size: .9rem !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 16px rgba(79,70,229,.3) !important;
+  letter-spacing: .3px !important;
+}
+
+.apply-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(79,70,229,.4) !important;
+}
+
+/* ================================================================
+   7. RESULTS TABLE
+   ================================================================ */
+.results-table-card {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 0 !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden !important;
+}
+
+.results-table-card table {
+  width: 100% !important;
+  min-width: 820px !important;
+  border-collapse: collapse !important;
+}
+
+.results-table-card th {
+  padding: 1rem 1.2rem !important;
+  background: linear-gradient(90deg, rgba(79,70,229,.07), rgba(6,182,212,.05)) !important;
+  color: var(--text-1) !important;
+  font-weight: 700 !important;
+  font-size: .82rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  border-bottom: 2px solid var(--border) !important;
+  white-space: nowrap !important;
+}
+
+.results-table-card td {
+  padding: .95rem 1.2rem !important;
+  color: var(--text-2) !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .9rem !important;
+  vertical-align: middle !important;
+}
+
+.results-table-card tr:last-child td { border-bottom: none !important; }
+.results-table-card tr:hover td { background: #f8f9ff !important; }
+
+/* Status badges in results */
+.badge-pill {
+  padding: .3rem .8rem !important;
+  border-radius: 999px !important;
+  font-size: .75rem !important;
+  font-weight: 700 !important;
+  letter-spacing: .3px !important;
+}
+
+.badge-pending  { background: rgba(245,158,11,.15) !important; color: #d97706 !important; }
+.badge-pass     { background: rgba(16,185,129,.15) !important; color: #059669 !important; }
+.badge-fail     { background: rgba(239,68,68,.15)  !important; color: #dc2626 !important; }
+.badge-selected { background: rgba(16,185,129,.15) !important; color: #059669 !important; }
+.badge-rejected { background: rgba(100,116,139,.12)!important; color: #64748b !important; }
+
+/* ================================================================
+   8. LEADERBOARD
+   ================================================================ */
+.lb-stats {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2.5rem !important;
+  width: 100% !important;
+}
+
+.lb-stat {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1.5rem 1.2rem !important;
+  text-align: center !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.lb-stat::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transform: scaleX(0);
+  transition: transform .3s ease;
+}
+
+.lb-stat:hover {
+  transform: translateY(-6px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(79,70,229,.3) !important;
+}
+
+.lb-stat:hover::after { transform: scaleX(1); }
+
+.lb-stat-num {
+  font-size: 2.2rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  line-height: 1 !important;
+}
+
+.lb-stat-label {
+  font-size: .78rem !important;
+  font-weight: 600 !important;
+  color: var(--text-2) !important;
+  margin-top: .7rem !important;
+  letter-spacing: .4px !important;
+  text-transform: uppercase !important;
+}
+
+.lb-card {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 2rem !important;
+  margin-bottom: 1.8rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.lb-card:hover {
+  box-shadow: var(--shadow-md) !important;
+  border-color: rgba(79,70,229,.2) !important;
+}
+
+.lb-card-title {
+  font-size: 1.2rem !important;
+  font-weight: 800 !important;
+  color: var(--text-1) !important;
+  margin-bottom: 1.5rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 2px solid #f1f5f9 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: .6rem !important;
+}
+
+/* Department rows */
+.lb-dept-list { display: grid !important; gap: .9rem !important; }
+
+.lb-dept-row {
+  background: #fafbff !important;
+  border: 1px solid #eaecf8 !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1.2rem 1.4rem !important;
+  display: grid !important;
+  grid-template-columns: 56px 1fr 190px !important;
+  gap: 1.2rem !important;
+  align-items: center !important;
+  transition: var(--transition) !important;
+  box-sizing: border-box !important;
+}
+
+.lb-dept-row:hover {
+  background: #f3f4ff !important;
+  border-color: rgba(79,70,229,.2) !important;
+  transform: translateX(4px) !important;
+}
+
+.lb-rank { font-size: 1.6rem !important; font-weight: 900 !important; text-align: center !important; }
+
+.lb-rank-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important; height: 36px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  font-size: .82rem !important;
+  box-shadow: 0 3px 10px rgba(79,70,229,.3) !important;
+}
+
+.lb-dept-name {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--text-1) !important;
+  margin-bottom: .4rem !important;
+}
+
+.lb-dept-meta {
+  font-size: .8rem !important;
+  color: var(--text-2) !important;
+  display: flex !important;
+  gap: 1.2rem !important;
+  flex-wrap: wrap !important;
+}
+
+.lb-pct-bar {
+  background: #e8eaf6 !important;
+  border-radius: 99px !important;
+  height: 7px !important;
+  overflow: hidden !important;
+  margin-top: .5rem !important;
+}
+
+.lb-pct-fill {
+  background: linear-gradient(90deg, var(--primary), var(--accent)) !important;
+  height: 100% !important;
+  border-radius: 99px !important;
+  transition: width .7s cubic-bezier(.4,0,.2,1) !important;
+}
+
+/* Leaderboard table */
+.lb-table { width: 100% !important; border-collapse: collapse !important; }
+
+.lb-table thead { background: linear-gradient(90deg, rgba(79,70,229,.08), rgba(6,182,212,.05)) !important; }
+
+.lb-table th {
+  padding: 1rem 1.1rem !important;
+  text-align: left !important;
+  font-weight: 700 !important;
+  font-size: .8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  color: var(--text-1) !important;
+  border-bottom: 2px solid var(--border) !important;
+  white-space: nowrap !important;
+}
+
+.lb-table td {
+  padding: .9rem 1.1rem !important;
+  color: var(--text-2) !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .88rem !important;
+  vertical-align: middle !important;
+}
+
+.lb-table tbody tr:hover { background: #f8f9ff !important; }
+.lb-table tbody tr:last-child td { border-bottom: none !important; }
+
+/* ================================================================
+   9. ADMIN / STAFF PAGES (companies, applications, students)
+   ================================================================ */
+
+/* Glass card used in admin/staff pages */
+.glass-card {
+  background: rgba(255,255,255,.88) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1.5px solid rgba(255,255,255,.6) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Admin/staff table wrappers */
+.table-wrapper,
+.admin-table-wrapper {
+  overflow-x: auto !important;
+  border-radius: var(--radius-md) !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--card-bg) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+/* All content tables in admin/staff */
+.table-wrapper table,
+.admin-table-wrapper table,
+.ref-table,
+.lb-table-wrap table {
+  width: 100% !important;
+  min-width: 700px !important;
+  border-collapse: collapse !important;
+}
+
+.table-wrapper th,
+.admin-table-wrapper th {
+  padding: .95rem 1.1rem !important;
+  background: linear-gradient(90deg, rgba(79,70,229,.07), rgba(6,182,212,.04)) !important;
+  color: var(--text-1) !important;
+  font-weight: 700 !important;
+  font-size: .8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  border-bottom: 2px solid var(--border) !important;
+  white-space: nowrap !important;
+}
+
+.table-wrapper td,
+.admin-table-wrapper td {
+  padding: .9rem 1.1rem !important;
+  color: var(--text-2) !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .88rem !important;
+  vertical-align: middle !important;
+}
+
+.table-wrapper tr:hover td,
+.admin-table-wrapper tr:hover td { background: #f8f9ff !important; }
+
+/* ================================================================
+   10. FORM CONTROLS — modern style for admin/staff forms
+   ================================================================ */
+.form-control,
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  border-radius: var(--radius-sm) !important;
+  border: 1.5px solid #d1d5db !important;
+  padding: .7rem 1rem !important;
+  font-size: .9rem !important;
+  font-family: inherit !important;
+  color: var(--text-1) !important;
+  background: #fff !important;
+  transition: border-color .2s, box-shadow .2s !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.form-control:focus,
+.form-select:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.15) !important;
+}
+
+/* ================================================================
+   11. BUTTONS — consistent modern CTAs
+   ================================================================ */
+.btn,
+.btn-primary,
+.btn-danger,
+.lb-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: .45rem !important;
+  padding: .7rem 1.5rem !important;
+  border-radius: var(--radius-sm) !important;
+  font-size: .88rem !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  border: none !important;
+  transition: var(--transition) !important;
+  letter-spacing: .2px !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.btn-primary,
+.lb-btn {
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,.3) !important;
+}
+
+.btn-primary:hover,
+.lb-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(79,70,229,.4) !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(239,68,68,.25) !important;
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(239,68,68,.35) !important;
+}
+
+/* Withdraw button */
+.withdraw-btn {
+  padding: .45rem .95rem !important;
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 700 !important;
+  font-size: .8rem !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+}
+
+.withdraw-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 14px rgba(239,68,68,.3) !important;
+}
+
+/* ================================================================
+   12. ALERT BOXES
+   ================================================================ */
+.alert-box {
+  padding: 1rem 1.4rem !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 1.5rem !important;
+  border-left: 4px solid !important;
+  font-weight: 600 !important;
+  font-size: .9rem !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: .5rem !important;
+}
+
+.alert-danger  { background: rgba(239,68,68,.08) !important;  border-left-color: #ef4444 !important; color: #b91c1c !important; }
+.alert-success { background: rgba(16,185,129,.08) !important; border-left-color: #10b981 !important; color: #065f46 !important; }
+.alert-warning { background: rgba(245,158,11,.08) !important; border-left-color: #f59e0b !important; color: #92400e !important; }
+
+/* Generic alert (admin pages use .alert) */
+.alert {
+  padding: 1rem 1.4rem !important;
+  border-radius: var(--radius-md) !important;
+  margin-bottom: 1.5rem !important;
+  font-weight: 600 !important;
+  font-size: .9rem !important;
+  animation: slideUp .5s ease-out !important;
+}
+
+.alert-success { background: rgba(16,185,129,.1) !important; color: #065f46 !important; border: 1px solid rgba(16,185,129,.25) !important; }
+.alert-danger  { background: rgba(239,68,68,.1) !important;  color: #b91c1c !important; border: 1px solid rgba(239,68,68,.25) !important; }
+
+/* ================================================================
+   13. EMPTY STATE
+   ================================================================ */
+.empty-state {
+  text-align: center !important;
+  padding: 3.5rem 2rem !important;
+  background: #fafbff !important;
+  border: 2px dashed #c7d2fe !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.empty-state p { color: var(--text-2) !important; font-size: 1rem !important; font-weight: 500 !important; margin: .4rem 0 !important; }
+
+/* ================================================================
+   14. MODAL — upgrade to match new design
+   ================================================================ */
+.modal-overlay {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  background: rgba(15,23,42,.55) !important;
+}
+
+.modal-box {
+  background: var(--card-bg) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 2.2rem !important;
+  max-width: 540px !important;
+  width: 95% !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,.22) !important;
+  border: 1.5px solid rgba(79,70,229,.15) !important;
+}
+
+.modal-title {
+  font-size: 1.3rem !important;
+  font-weight: 800 !important;
+  color: var(--text-1) !important;
+  margin-bottom: 1.2rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 2px solid #f1f5f9 !important;
+}
+
+.modal-company-name {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: var(--primary) !important;
+  margin-bottom: 1rem !important;
+}
+
+.modal-confirm-btn {
+  flex: 1 !important;
+  padding: .85rem !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+  box-shadow: 0 4px 14px rgba(79,70,229,.3) !important;
+}
+
+.modal-confirm-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 22px rgba(79,70,229,.4) !important;
+}
+
+.modal-cancel-btn {
+  flex: 1 !important;
+  padding: .85rem !important;
+  background: #f1f5f9 !important;
+  color: var(--text-2) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: var(--transition) !important;
+}
+
+.modal-cancel-btn:hover { background: #e2e8f0 !important; }
+
+/* ================================================================
+   15. ANIMATIONS
+   ================================================================ */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  from { transform: scale(.92); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 14px rgba(79,70,229,.3); }
+  50%       { box-shadow: 0 8px 28px rgba(79,70,229,.5); }
+}
+
+/* Entrance animation for cards */
+.drive-card,
+.lb-card,
+.lb-stat,
+.results-table-card {
+  animation: slideUp .5s ease-out both;
+}
+
+.drive-card:nth-child(1) { animation-delay: .05s; }
+.drive-card:nth-child(2) { animation-delay: .10s; }
+.drive-card:nth-child(3) { animation-delay: .15s; }
+.drive-card:nth-child(4) { animation-delay: .20s; }
+.drive-card:nth-child(5) { animation-delay: .25s; }
+
+/* ================================================================
+   16. ALL DRIVES REFERENCE TABLE (drives.php bottom section)
+   ================================================================ */
+.ref-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  min-width: 700px !important;
+}
+
+.ref-table th {
+  padding: .9rem 1.1rem !important;
+  text-align: left !important;
+  background: linear-gradient(90deg, rgba(79,70,229,.07), transparent) !important;
+  color: var(--text-1) !important;
+  font-weight: 700 !important;
+  font-size: .78rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  border-bottom: 2px solid var(--border) !important;
+}
+
+.ref-table td {
+  padding: .85rem 1.1rem !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .88rem !important;
+  color: var(--text-2) !important;
+  vertical-align: middle !important;
+}
+
+.ref-table tr:hover td { background: #f8f9ff !important; }
+.ref-table tr:last-child td { border-bottom: none !important; }
+
+/* Scrollable table container for "All Drives" */
+.drives-container > div[style*="overflow-x"] {
+  border-radius: var(--radius-lg) !important;
+  border: 1.5px solid var(--border) !important;
+  box-shadow: var(--shadow-sm) !important;
+  overflow: hidden !important;
+}
+
+/* ================================================================
+   17. SECTION HEADINGS (h2 inside containers)
+   ================================================================ */
+.drives-container h2,
+.results-container h2,
+.lb-container h2,
+.container h2 {
+  font-size: 1.4rem !important;
+  font-weight: 800 !important;
+  color: var(--text-1) !important;
+  margin-bottom: 1.4rem !important;
+  letter-spacing: -.3px !important;
+}
+
+/* ================================================================
+   18. PROGRESS BARS & PERCENTAGE DISPLAY
+   ================================================================ */
+.lb-pct-bar {
+  position: relative !important;
+  background: #e8eaf6 !important;
+  border-radius: 99px !important;
+  height: 8px !important;
+  overflow: visible !important;
+  margin-top: .4rem !important;
+}
+
+/* ================================================================
+   19. STAT CARDS (stud dashboard pattern reused in leaderboard)
+   ================================================================ */
+.stud-stat {
+  border-radius: var(--radius-md) !important;
+  transition: var(--transition) !important;
+}
+
+.stud-stat:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ================================================================
+   20. SCROLLBAR — subtle & modern
+   ================================================================ */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ================================================================
+   21. RESPONSIVE TABLE SCROLL WRAPPER
+   ================================================================ */
+@media (max-width: 768px) {
+  .lb-dept-row {
+    grid-template-columns: 48px 1fr !important;
+  }
+  .lb-dept-row > div:last-child { display: none !important; }
+
+  .drive-details {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .drives-header h1,
+  .results-header h1,
+  .lb-header h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .lb-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .drive-details { grid-template-columns: 1fr !important; }
+  .lb-stats { grid-template-columns: 1fr !important; }
+}
+
+/* ================================================================
+   22. NEUTRALISE LOCAL STYLE OVERRIDES
+   Some pages define .container in their own <style> block with
+   reduced padding. These rules run last and restore consistency.
+   ================================================================ */
+
+/* staff/stats.php defines .container { padding: 0 1.5rem }
+   which strips the top/bottom. Fix: already handled by rule 3 above
+   (main-content-wrapper > .container). But local <style> wins on
+   specificity — boost ours with the :is() trick */
+:is(.main-content-wrapper) > .container {
+  padding: 2.5rem 2.5rem 4rem !important;
+  max-width: 1200px !important;
+  box-sizing: border-box !important;
+}
+
+/* ================================================================
+   23. PAGE-HEADER — uniform across ALL pages
+   ================================================================ */
+.page-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  flex-wrap: wrap !important;
+  gap: 1rem !important;
+  margin-bottom: 2rem !important;
+}
+
+.page-header h1,
+.page-header h2 {
+  font-size: 2rem !important;
+  font-weight: 900 !important;
+  margin: 0 0 .3rem 0 !important;
+  letter-spacing: -.4px !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.page-header p {
+  color: var(--text-2) !important;
+  font-size: .95rem !important;
+  margin: 0 !important;
+}
+
+/* ================================================================
+   24. CARD — normalise across student/staff/admin pages
+   ================================================================ */
+.card {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 1.6rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  box-sizing: border-box !important;
+  transition: var(--transition) !important;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md) !important;
+}
+
+/* Card headers */
+.card-header,
+.card h3,
+.card .card-title {
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: var(--text-1) !important;
+  margin-bottom: 1rem !important;
+}
+
+/* ================================================================
+   25. STATS GRID (staff/stats.php, student dashboard)
+   ================================================================ */
+.stats-grid,
+.stat-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important;
+  gap: 1.2rem !important;
+  margin-bottom: 2rem !important;
+  width: 100% !important;
+}
+
+.stat-card,
+.stud-stat {
+  background: var(--card-bg) !important;
+  border: 1.5px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 1.4rem 1.2rem !important;
+  box-shadow: var(--shadow-sm) !important;
+  transition: var(--transition) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  box-sizing: border-box !important;
+}
+
+.stat-card:hover,
+.stud-stat:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-color: rgba(79,70,229,.25) !important;
+}
+
+.stat-info h3,
+.stat-card h3 {
+  font-size: 1.8rem !important;
+  font-weight: 900 !important;
+  background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  margin: 0 0 .2rem 0 !important;
+  line-height: 1 !important;
+}
+
+.stat-info p,
+.stat-card p {
+  font-size: .82rem !important;
+  font-weight: 600 !important;
+  color: var(--text-2) !important;
+  margin: 0 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .4px !important;
+}
+
+/* ================================================================
+   26. TABLE-RESPONSIVE wrapper for stats/admin pages
+   ================================================================ */
+.table-responsive {
+  overflow-x: auto !important;
+  border-radius: var(--radius-md) !important;
+  border: 1.5px solid var(--border) !important;
+  background: var(--card-bg) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.table-responsive table {
+  width: 100% !important;
+  min-width: 680px !important;
+  border-collapse: collapse !important;
+}
+
+.table-responsive th {
+  padding: .95rem 1.1rem !important;
+  background: linear-gradient(90deg, rgba(79,70,229,.07), rgba(6,182,212,.04)) !important;
+  color: var(--text-1) !important;
+  font-weight: 700 !important;
+  font-size: .8rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  border-bottom: 2px solid var(--border) !important;
+  white-space: nowrap !important;
+}
+
+.table-responsive td {
+  padding: .9rem 1.1rem !important;
+  color: var(--text-2) !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .88rem !important;
+  vertical-align: middle !important;
+}
+
+.table-responsive tr:hover td { background: #f8f9ff !important; }
+.table-responsive tr:last-child td { border-bottom: none !important; }
+
+/* ================================================================
+   27. PROFILE PAGES (student/profile.php, staff/profile.php)
+   ================================================================ */
+.profile-avatar,
+.sidebar-avatar img {
+  border-radius: 50% !important;
+}
+
+/* Profile header card */
+.main-content-wrapper .card:first-of-type .d-flex {
+  gap: 1.5rem !important;
+  flex-wrap: wrap !important;
+}
+
+/* ================================================================
+   28. ANNOUNCEMENTS / ADMIN FORMS
+   ================================================================ */
+.d-flex { display: flex !important; }
+.flex-wrap { flex-wrap: wrap !important; }
+.gap-1 { gap: .5rem !important; }
+.gap-2 { gap: 1rem !important; }
+.align-center { align-items: center !important; }
+.justify-between { justify-content: space-between !important; }
+
+/* ================================================================
+   29. RESPONSIVE — MOBILE for .container direct child
+   ================================================================ */
+@media (max-width: 900px) {
+  :is(.main-content-wrapper) > .container {
+    padding: 5rem 1rem 3rem !important;
+  }
+  .stats-grid,
+  .stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid,
+  .stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+  :is(.main-content-wrapper) > .container {
+    padding: 5rem .75rem 3rem !important;
+  }
+}

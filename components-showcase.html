@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Components Showcase - Modern Design System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/campuss/css/modern-design.css">
+    <style>
+        body {
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+        }
+
+        .section-title {
+            font-size: var(--font-size-2xl);
+            font-weight: 800;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .component-demo {
+            background: rgba(125, 29, 127, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .component-label {
+            font-size: var(--font-size-xs);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            font-weight: 700;
+        }
+
+        .component-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100px;
+        }
+
+        .sample-text {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Code Display */
+        .code-display {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+
+        .code-display code {
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-size-xs);
+            color: var(--accent-cyan);
+            line-height: 1.5;
+        }
+
+        /* Button Showcase */
+        .button-showcase {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        /* Color Grid */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .color-swatch {
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .color-swatch-name {
+            font-size: var(--font-size-xs);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .color-swatch-code {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Typography Samples */
+        .typography-sample {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: var(--radius-md);
+            background: rgba(125, 29, 127, 0.05);
+        }
+
+        /* Stats Display */
+        .stats-demo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: rgba(125, 29, 127, 0.08);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: var(--font-size-3xl);
+            font-weight: 800;
+            color: var(--primary-400);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        /* TOC */
+        .toc {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .toc-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-list li {
+            margin-bottom: 0.5rem;
+        }
+
+        .toc-list a {
+            color: var(--primary-400);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .toc-list a:hover {
+            color: var(--accent-cyan);
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .section-title {
+                font-size: var(--font-size-xl);
+            }
+
+            .component-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-showcase {
+                flex-direction: column;
+            }
+
+            .button-showcase .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: var(--font-size-4xl); font-weight: 800; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                Modern Design System
+            </h1>
+            <p style="color: var(--text-secondary); font-size: var(--font-size-lg);">
+                Complete component showcase and reference guide
+            </p>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h3 class="toc-title">📑 Components Overview</h3>
+            <ul class="toc-list">
+                <li><a href="#buttons">Buttons</a></li>
+                <li><a href="#cards">Cards</a></li>
+                <li><a href="#forms">Forms</a></li>
+                <li><a href="#badges">Badges</a></li>
+                <li><a href="#tables">Tables</a></li>
+                <li><a href="#alerts">Alerts</a></li>
+                <li><a href="#colors">Colors</a></li>
+                <li><a href="#typography">Typography</a></li>
+                <li><a href="#spacing">Spacing & Utilities</a></li>
+                <li><a href="#theme">Theme Toggle</a></li>
+            </ul>
+        </div>
+
+        <!-- BUTTONS -->
+        <div class="section" id="buttons">
+            <h2 class="section-title">🔘 Buttons</h2>
+
+            <div class="component-grid">
+                <div class="component-demo">
+                    <span class="component-label">Primary</span>
+                    <div class="component-content">
+                        <button class="btn btn-primary">Primary Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-primary"&gt;Click&lt;/button&gt;</code></div>
+                </div>
+
+                <div class="component-demo">
+                    <span class="component-label">Secondary</span>
+                    <div class="component-content">
+                        <button class="btn btn-secondary">Secondary Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-secondary"&gt;Click&lt;/button&gt;</code></div>
+                </div>
+
+                <div class="component-demo">
+                    <span class="component-label">Outline</span>
+                    <div class="component-content">
+                        <button class="btn btn-outline">Outline Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-outline"&gt;Click&lt;/button&gt;</code></div>
+                </div>
+
+                <div class="component-demo">
+                    <span class="component-label">Ghost</span>
+                    <div class="component-content">
+                        <button class="btn btn-ghost">Ghost Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-ghost"&gt;Click&lt;/button&gt;</code></div>
+                </div>
+
+                <div class="component-demo">
+                    <span class="component-label">Success</span>
+                    <div class="component-content">
+                        <button class="btn btn-success">Success Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-success"&gt;Success&lt;/button&gt;</code></div>
+                </div>
+
+                <div class="component-demo">
+                    <span class="component-label">Danger</span>
+                    <div class="component-content">
+                        <button class="btn btn-danger">Delete Button</button>
+                    </div>
+                    <div class="code-display"><code>&lt;button class="btn btn-danger"&gt;Delete&lt;/button&gt;</code></div>
+                </div>
+            </div>
+
+            <div class="component-demo">
+                <span class="component-label">Button Sizes</span>
+                <div class="button-showcase">
+                    <button class="btn btn-primary btn-sm">Small</button>
+                    <button class="btn btn-primary btn-base">Base</button>
+                    <button class="btn btn-primary btn-lg">Large</button>
+                    <button class="btn btn-primary btn-block">Full Width</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARDS -->
+        <div class="section" id="cards">
+            <h2 class="section-title">🎴 Cards</h2>
+
+            <div class="component-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Default Card</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="sample-text">This is a standard card component with header, body, and optional footer.</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm btn-outline">Learn More</button>
+                    </div>
+                </div>
+
+                <div class="card card-gradient">
+                    <div class="card-header">
+                        <h3 class="card-title">Gradient Card</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="sample-text">Cards with gradient backgrounds for emphasis and visual hierarchy.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="text-align: center; padding: 1.5rem 0;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--gradient-primary); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 2rem; color: white; font-weight: bold;">$</div>
+                        <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Stat Card</h3>
+                        <p style="color: var(--text-secondary); font-size: var(--font-size-sm);">Perfect for displaying KPIs and metrics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORMS -->
+        <div class="section" id="forms">
+            <h2 class="section-title">Form Elements</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Form Components</h3>
+                </div>
+                <div class="card-body">
+                    <div class="component-grid" style="grid-template-columns: 1fr;">
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-control" placeholder="your@email.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-control" placeholder="••••••••">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-control" placeholder="your username">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select class="form-control">
+                                <option value="">Select a department</option>
+                                <option value="cs">Computer Science</option>
+                                <option value="ec">Electronics</option>
+                                <option value="me">Mechanical</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Message</label>
+                            <textarea class="form-control" rows="3" placeholder="Your message..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="checkbox" id="agree" class="form-checkbox">
+                            <label for="agree" class="form-label">I agree to the terms and conditions</label>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <div style="display: flex; gap: 2rem;">
+                                <div>
+                                    <input type="radio" id="male" name="gender" class="form-radio">
+                                    <label for="male" class="form-label">Male</label>
+                                </div>
+                                <div>
+                                    <input type="radio" id="female" name="gender" class="form-radio">
+                                    <label for="female" class="form-label">Female</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BADGES -->
+        <div class="section" id="badges">
+            <h2 class="section-title">Badges</h2>
+
+            <div class="component-demo">
+                <span class="component-label">Badge Types</span>
+                <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; padding: 2rem;">
+                    <span class="badge">Default</span>
+                    <span class="badge badge-primary">Primary</span>
+                    <span class="badge badge-secondary">Secondary</span>
+                    <span class="badge badge-success">Success</span>
+                    <span class="badge badge-warning">Warning</span>
+                    <span class="badge badge-danger">Danger</span>
+                    <span class="badge badge-info">Info</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLES -->
+        <div class="section" id="tables">
+            <h2 class="section-title">Tables</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Sample Data Table</h3>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Rajesh Kumar</td>
+                                <td>rajesh@example.com</td>
+                                <td>Computer Science</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td><button class="btn btn-sm btn-ghost">Edit</button></td>
+                            </tr>
+                            <tr>
+                                <td>Priya Singh</td>
+                                <td>priya@example.com</td>
+                                <td>Electronics</td>
+                                <td><span class="badge badge-warning">Pending</span></td>
+                                <td><button class="btn btn-sm btn-ghost">Edit</button></td>
+                            </tr>
+                            <tr>
+                                <td>Arjun Patel</td>
+                                <td>arjun@example.com</td>
+                                <td>Mechanical</td>
+                                <td><span class="badge badge-danger">Inactive</span></td>
+                                <td><button class="btn btn-sm btn-ghost">Edit</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ALERTS -->
+        <div class="section" id="alerts">
+            <h2 class="section-title">🔔 Alerts</h2>
+
+            <div style="display: grid; gap: 1rem;">
+                <div class="alert alert-success">
+                    ✓ Your changes have been saved successfully!
+                </div>
+
+                <div class="alert alert-error">
+                    ✗ An error occurred while processing your request.
+                </div>
+
+                <div class="alert alert-warning">
+                    ⚠ Please review your information before proceeding.
+                </div>
+
+                <div class="alert alert-info">
+                    ℹ New opportunities are available in your dashboard.
+                </div>
+            </div>
+        </div>
+
+        <!-- COLORS -->
+        <div class="section" id="colors">
+            <h2 class="section-title">🎨 Color Palette</h2>
+
+            <h3 style="margin-bottom: 1.5rem; color: var(--text-secondary);">Primary Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: var(--primary-50); border: 1px solid var(--border-color);">
+                    <div class="color-swatch-name">Primary 50</div>
+                    <div class="color-swatch-code">#f3e8ff</div>
+                </div>
+                <div class="color-swatch" style="background: var(--primary-400); border: 1px solid var(--primary-400);">
+                    <div class="color-swatch-name" style="color: white;">Primary 400</div>
+                    <div class="color-swatch-code" style="color: rgba(255,255,255,0.8);">#c084fc</div>
+                </div>
+                <div class="color-swatch" style="background: var(--primary-600); border: 1px solid var(--primary-600);">
+                    <div class="color-swatch-name" style="color: white;">Primary 600</div>
+                    <div class="color-swatch-code" style="color: rgba(255,255,255,0.8);">#9333ea</div>
+                </div>
+            </div>
+
+            <h3 style="margin-bottom: 1.5rem; margin-top: 2rem; color: var(--text-secondary);">Status Colors</h3>
+            <div class="color-grid">
+                <div class="color-swatch" style="background: var(--success); border: 1px solid var(--success);">
+                    <div class="color-swatch-name" style="color: #000;">Success</div>
+                    <div class="color-swatch-code" style="color: #000;">#00ff88</div>
+                </div>
+                <div class="color-swatch" style="background: var(--warning); border: 1px solid var(--warning);">
+                    <div class="color-swatch-name" style="color: #000;">Warning</div>
+                    <div class="color-swatch-code" style="color: #000;">#ffb703</div>
+                </div>
+                <div class="color-swatch" style="background: var(--danger); border: 1px solid var(--danger);">
+                    <div class="color-swatch-name" style="color: white;">Danger</div>
+                    <div class="color-swatch-code" style="color: rgba(255,255,255,0.8);">#ff006e</div>
+                </div>
+                <div class="color-swatch" style="background: var(--info); border: 1px solid var(--info);">
+                    <div class="color-swatch-name" style="color: white;">Info</div>
+                    <div class="color-swatch-code" style="color: rgba(255,255,255,0.8);">#0080ff</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TYPOGRAPHY -->
+        <div class="section" id="typography">
+            <h2 class="section-title">✏️ Typography</h2>
+
+            <div class="card">
+                <div class="card-body">
+                    <h1 class="typography-sample">Heading 1 (4xl - 2.25rem)</h1>
+                    <h2 class="typography-sample">Heading 2 (3xl - 1.875rem)</h2>
+                    <h3 class="typography-sample">Heading 3 (2xl - 1.5rem)</h3>
+                    <h4 class="typography-sample">Heading 4 (xl - 1.25rem)</h4>
+                    <p class="typography-sample">Paragraph (base - 1rem) - Regular body text for content and descriptions</p>
+                    <p class="typography-sample" style="font-size: var(--font-size-sm);">Small text (sm - 0.875rem) - Used for captions and helper text</p>
+                    <p class="typography-sample" style="font-size: var(--font-size-xs);">Extra small text (xs - 0.75rem) - Used for labels and micro-text</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPACING & UTILITIES -->
+        <div class="section" id="spacing">
+            <h2 class="section-title">📐 Spacing & Utilities</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Spacing Scale</h3>
+                </div>
+                <div class="card-body">
+                    <div style="display: grid; gap: 2rem;">
+                        <div>
+                            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: var(--font-size-sm);">xs (0.25rem)</p>
+                            <div style="background: var(--gradient-primary); padding: var(--spacing-xs); border-radius: var(--radius-md); width: 50px; height: 20px;"></div>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: var(--font-size-sm);">sm (0.5rem)</p>
+                            <div style="background: var(--gradient-primary); padding: var(--spacing-sm); border-radius: var(--radius-md); width: 50px; height: 20px;"></div>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: var(--font-size-sm);">md (1rem)</p>
+                            <div style="background: var(--gradient-primary); padding: var(--spacing-md); border-radius: var(--radius-md); width: 50px; height: 20px;"></div>
+                        </div>
+                        <div>
+                            <p style="margin-bottom: 1rem; color: var(--text-secondary); font-size: var(--font-size-sm);">lg (1.5rem)</p>
+                            <div style="background: var(--gradient-primary); padding: var(--spacing-lg); border-radius: var(--radius-md); width: 50px; height: 20px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THEME TOGGLE -->
+        <div class="section" id="theme">
+            <h2 class="section-title">🌓 Theme Toggle</h2>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Dark/Light Mode</h3>
+                </div>
+                <div class="card-body">
+                    <p style="margin-bottom: 1.5rem; color: var(--text-secondary);">
+                        Click the button below to toggle between dark and light themes. Your preference is saved locally.
+                    </p>
+                    <button id="theme-toggle-demo" class="btn btn-primary">
+                        Toggle Theme
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color);">
+            <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Modern Design System v1.0</p>
+            <p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">
+                Built for Campus Recruitment System | Glassmorphism + Neumorphism Design
+            </p>
+        </div>
+    </div>
+
+    <script src="/campuss/js/theme-manager.js"></script>
+    <script src="/campuss/js/animations.js"></script>
+    <script>
+        // Initialize theme manager
+        const themeManager = new ThemeManager();
+        themeManager.init();
+        themeManager.setupToggleListener();
+
+        // Theme toggle demo button
+        const themeDemoBtn = document.getElementById('theme-toggle-demo');
+        if (themeDemoBtn) {
+            themeDemoBtn.addEventListener('click', () => {
+                themeManager.toggle();
+                new Toast('Theme toggled!', 'success');
+            });
+        }
+
+        // Initialize animations and ripples
+        document.querySelectorAll('.btn').forEach(btn => {
+            new RippleButton(btn);
+        });
+
+        // Show Toast on page load
+        window.addEventListener('load', () => {
+            new Toast('Welcome to Components Showcase! 🎨', 'success');
+        });
+    </script>
+</body>
+</html>

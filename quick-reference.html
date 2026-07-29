@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Design System - Quick Reference Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/campuss/css/modern-design.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            padding: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .print-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .print-btn {
+            background: var(--primary-600);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .print-btn:hover {
+            background: var(--primary-700);
+            transform: translateY(-2px);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-ref {
+            background: rgba(125, 29, 127, 0.08);
+            backdrop-filter: var(--blur-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+        }
+
+        .card-ref-title {
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .code-snippet {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-size-xs);
+            color: var(--accent-cyan);
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+
+        .code-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            margin-bottom: 0.35rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        .section-divider {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+                background: white;
+            }
+
+            .print-controls {
+                display: none;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .card-ref {
+                page-break-inside: avoid;
+            }
+
+            .grid-layout {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            @page {
+                size: A4;
+                margin: 1cm;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        .badge-demo {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .button-demo {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-links {
+            background: var(--primary-600);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+        }
+
+        .quick-links h3 {
+            margin-bottom: 1rem;
+        }
+
+        .quick-links ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .quick-links li {
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .quick-links li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+        }
+
+        .quick-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .quick-links a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        .shortcut-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0.75rem;
+        }
+
+        .shortcut-table th,
+        .shortcut-table td {
+            border: 1px solid var(--border-color);
+            padding: 0.5rem;
+            text-align: left;
+            font-size: var(--font-size-xs);
+        }
+
+        .shortcut-table th {
+            background: rgba(125, 29, 127, 0.1);
+            font-weight: 700;
+        }
+
+        .shortcut-table code {
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-size-xs);
+            color: var(--accent-cyan);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Modern Design System</h1>
+            <p style="color: var(--text-secondary);">Quick Reference Card</p>
+            <p style="font-size: var(--font-size-xs); color: var(--text-tertiary); margin-top: 0.5rem;">CampusRM UI/UX Design System v1.0</p>
+        </div>
+
+        <!-- Print Controls -->
+        <div class="print-controls">
+            <button class="print-btn" onclick="window.print()">Print Card</button>
+            <button class="print-btn" onclick="downloadAsImage()">Download as Image</button>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="/campuss/components-showcase.html">Component Showcase</a></li>
+                <li><a href="/campuss/INTEGRATION_GUIDE.md">Integration Guide</a></li>
+                <li><a href="/campuss/MIGRATION_CHECKLIST.md">Migration Checklist</a></li>
+                <li><a href="/campuss/dashboard-template.html">Dashboard Demo</a></li>
+                <li><a href="/campuss/login-template.html">Login Demo</a></li>
+                <li><a href="/campuss/DESIGN_SYSTEM_README.md">Full README</a></li>
+            </ul>
+        </div>
+
+        <!-- Main Reference Grid -->
+        <div class="grid-layout">
+            <!-- BUTTONS -->
+            <div class="card-ref">
+                <div class="card-ref-title">🔘 Buttons</div>
+
+                <div class="code-label">Primary</div>
+                <div class="code-snippet">&lt;button class="btn btn-primary"&gt;Click&lt;/button&gt;</div>
+
+                <div class="code-label">Secondary</div>
+                <div class="code-snippet">&lt;button class="btn btn-secondary"&gt;Click&lt;/button&gt;</div>
+
+                <div class="code-label">Danger</div>
+                <div class="code-snippet">&lt;button class="btn btn-danger"&gt;Delete&lt;/button&gt;</div>
+
+                <div class="code-label">Sizes</div>
+                <div class="code-snippet">btn-sm | btn-base | btn-lg | btn-block</div>
+
+                <div class="button-demo">
+                    <button class="btn btn-primary btn-sm">Sm</button>
+                    <button class="btn btn-primary btn-base">Base</button>
+                    <button class="btn btn-primary btn-lg">Lg</button>
+                </div>
+            </div>
+
+            <!-- CARDS -->
+            <div class="card-ref">
+                <div class="card-ref-title">🎴 Cards</div>
+
+                <div class="code-label">Basic Card</div>
+                <div class="code-snippet">&lt;div class="card"&gt;
+  &lt;div class="card-header"&gt;
+    &lt;h3&gt;Title&lt;/h3&gt;
+  &lt;/div&gt;
+  &lt;div class="card-body"&gt;
+    Content
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+
+                <div class="code-label">Variants</div>
+                <div class="code-snippet">card (default)
+card card-gradient
+card card-glass</div>
+            </div>
+
+            <!-- FORMS -->
+            <div class="card-ref">
+                <div class="card-ref-title">📝 Forms</div>
+
+                <div class="code-label">Form Group</div>
+                <div class="code-snippet">&lt;div class="form-group"&gt;
+  &lt;label class="form-label"&gt;
+    Label
+  &lt;/label&gt;
+  &lt;input type="text" class="form-control"&gt;
+&lt;/div&gt;</div>
+
+                <div class="code-label">Elements</div>
+                <div class="code-snippet">form-control
+form-label
+form-checkbox
+form-radio</div>
+            </div>
+
+            <!-- BADGES -->
+            <div class="card-ref">
+                <div class="card-ref-title">Badges</div>
+
+                <div class="code-label">Basic Badges</div>
+                <div class="badge-demo">
+                    <span class="badge">Default</span>
+                    <span class="badge badge-primary">Primary</span>
+                    <span class="badge badge-success">Success</span>
+                </div>
+
+                <div class="code-label">Status Badges</div>
+                <div class="code-snippet">badge-success (green)
+badge-warning (yellow)
+badge-danger (red)
+badge-info (blue)</div>
+            </div>
+
+            <!-- TABLES -->
+            <div class="card-ref">
+                <div class="card-ref-title">Tables</div>
+
+                <div class="code-label">Table Template</div>
+                <div class="code-snippet">&lt;table class="table"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Col1&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Data&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</div>
+
+                <div class="code-label">Features</div>
+                <div class="code-snippet">Striped rows (auto)
+Hover effects (auto)
+Responsive (auto)</div>
+            </div>
+
+            <!-- UTILITIES -->
+            <div class="card-ref">
+                <div class="card-ref-title">Utilities</div>
+
+                <div class="code-label">Spacing</div>
+                <div class="code-snippet">mt-1 mt-2 mt-3 (margin-top)
+mb-1 mb-2 mb-3 (margin-bottom)
+p-1 p-2 p-3 (padding)
+px-1 py-1 (padding sides)</div>
+
+                <div class="code-label">Flexbox</div>
+                <div class="code-snippet">flex (display: flex)
+flex-col (column)
+gap-1 gap-2 gap-3
+items-center
+justify-between</div>
+            </div>
+
+            <!-- THEME -->
+            <div class="card-ref">
+                <div class="card-ref-title">🌓 Theme System</div>
+
+                <div class="code-label">Setup</div>
+                <div class="code-snippet">&lt;body data-theme="dark"&gt;
+
+// In navbar
+&lt;button id="theme-toggle"&gt;
+  🌙
+&lt;/button&gt;</div>
+
+                <div class="code-label">Benefits</div>
+                <div class="code-snippet">Auto light/dark mode
+System preference detection
+localStorage persistence
+No page reload needed</div>
+            </div>
+
+            <!-- ALERTS -->
+            <div class="card-ref">
+                <div class="card-ref-title">🔔 Alerts</div>
+
+                <div class="code-label">Alert Types</div>
+                <div class="code-snippet">&lt;div class="alert alert-success"&gt;
+  Success message
+&lt;/div&gt;
+
+alert-success (green)
+alert-error (red)
+alert-warning (yellow)
+alert-info (blue)</div>
+            </div>
+
+            <!-- JAVASCRIPT -->
+            <div class="card-ref">
+                <div class="card-ref-title">⚡ JavaScript</div>
+
+                <div class="code-label">Toast Notifications</div>
+                <div class="code-snippet">new Toast('Message', 'success');
+new Toast('Error', 'error');
+new Toast('Warning', 'warning');
+new Toast('Info', 'info');</div>
+
+                <div class="code-label">Modal Dialog</div>
+                <div class="code-snippet">new Modal('Title', 'Content', {
+  primaryBtn: 'Yes',
+  onPrimary: () => {}
+}).show();</div>
+            </div>
+
+            <!-- ANIMATIONS -->
+            <div class="card-ref">
+                <div class="card-ref-title">🎬 Animations</div>
+
+                <div class="code-label">Available Animations</div>
+                <div class="code-snippet">slideUp (0.6s)
+slideIn (0.6s)
+fadeIn (0.4s)
+float (3s)
+pulse (2s)
+shake (0.5s)
+glow (2s)</div>
+
+                <div class="code-label">Counter Animation</div>
+                <div class="code-snippet">new CounterAnimation(
+  'element-id',
+  1000,    // target number
+  2000     // duration ms
+);</div>
+            </div>
+
+            <!-- CSS VARIABLES -->
+            <div class="card-ref">
+                <div class="card-ref-title">🎨 CSS Variables</div>
+
+                <div class="code-label">Colors</div>
+                <div class="code-snippet">--primary-600
+--secondary-500
+--success (green)
+--warning (yellow)
+--danger (red)
+--info (blue)</div>
+
+                <div class="code-label">Spacing</div>
+                <div class="code-snippet">xs sm md lg xl 2xl 3xl</div>
+
+                <div class="code-label">Sizing</div>
+                <div class="code-snippet">--font-size-xs to 4xl
+--radius-sm to full
+--blur-sm to lg</div>
+            </div>
+
+            <!-- FILES -->
+            <div class="card-ref">
+                <div class="card-ref-title">📁 Design System Files</div>
+
+                <div class="code-label">Included Files</div>
+                <table class="shortcut-table">
+                    <tr>
+                        <th>File</th>
+                        <th>Size</th>
+                    </tr>
+                    <tr>
+                        <td>css/modern-design.css</td>
+                        <td>45KB</td>
+                    </tr>
+                    <tr>
+                        <td>js/theme-manager.js</td>
+                        <td>1.8KB</td>
+                    </tr>
+                    <tr>
+                        <td>js/animations.js</td>
+                        <td>14KB</td>
+                    </tr>
+                </table>
+
+                <div class="code-label">Total Size</div>
+                <div class="code-snippet">~60.8KB (12.8KB gzipped)</div>
+            </div>
+        </div>
+
+        <!-- Common Patterns Section -->
+        <div style="margin-top: 3rem;">
+            <h2 style="font-size: var(--font-size-2xl); margin-bottom: 1.5rem; color: var(--text-primary);">
+                🔧 Common Patterns
+            </h2>
+
+            <div class="grid-layout">
+                <!-- Pattern: Button + Toast -->
+                <div class="card-ref">
+                    <div class="card-ref-title">Button with Toast</div>
+                    <div class="code-label">Code</div>
+                    <div class="code-snippet">&lt;button id="save-btn" 
+        class="btn btn-primary"&gt;
+  Save
+&lt;/button&gt;
+
+&lt;script&gt;
+document.getElementById('save-btn')
+  .addEventListener('click', () =&gt; {
+    new Toast('Saved!', 'success');
+  });
+&lt;/script&gt;</div>
+                </div>
+
+                <!-- Pattern: Form with Validation -->
+                <div class="card-ref">
+                    <div class="card-ref-title">Form with Validation</div>
+                    <div class="code-label">Code</div>
+                    <div class="code-snippet">&lt;form id="my-form"&gt;
+  &lt;div class="form-group"&gt;
+    &lt;input type="email" required&gt;
+  &lt;/div&gt;
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+form.addEventListener('submit', (e) =&gt; {
+  if (!form.checkValidity()) {
+    new Toast('Invalid form', 'error');
+  }
+});</div>
+                </div>
+
+                <!-- Pattern: Delete Modal -->
+                <div class="card-ref">
+                    <div class="card-ref-title">Delete Confirmation</div>
+                    <div class="code-label">Code</div>
+                    <div class="code-snippet">function deleteItem(id) {
+  new Modal('Delete?', 
+    'This cannot be undone.',
+    {
+      primaryBtn: 'Delete',
+      onPrimary: () =&gt; {
+        fetch(`/api/delete/${id}`, 
+          {method: 'DELETE'}
+        );
+      }
+    }
+  ).show();
+}</div>
+                </div>
+
+                <!-- Pattern: Stat Cards with Counters -->
+                <div class="card-ref">
+                    <div class="card-ref-title">Stat Card Counter</div>
+                    <div class="code-label">HTML</div>
+                    <div class="code-snippet">&lt;div class="card"&gt;
+  &lt;div class="stat-icon"&gt;👥&lt;/div&gt;
+  &lt;div class="stat-label"&gt;Students&lt;/div&gt;
+  &lt;div class="stat-value" 
+       id="count" 
+       data-counter="2847"&gt;
+    0
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+
+                    <div class="code-label">JavaScript</div>
+                    <div class="code-snippet">new CounterAnimation(
+  'count', 2847, 2000
+);</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integration Quick Start -->
+        <div style="margin-top: 3rem; margin-bottom: 3rem;">
+            <h2 style="font-size: var(--font-size-2xl); margin-bottom: 1.5rem; color: var(--text-primary);">
+                ⚡ 5-Minute Integration
+            </h2>
+
+            <div class="card-ref">
+                <table class="shortcut-table" style="width: 100%;">
+                    <tr>
+                        <th style="width: 40px;">Step</th>
+                        <th>Action</th>
+                        <th>File</th>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Add Google Fonts + CSS link</td>
+                        <td>header.php</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Add JS scripts</td>
+                        <td>footer.php</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Add data-theme="dark"</td>
+                        <td>All pages</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Add theme toggle button</td>
+                        <td>navbar/header</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Test theme toggle</td>
+                        <td>All pages</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Modern Design System v1.0 | CampusRM Campus Recruitment System</p>
+            <p>For complete documentation, visit <code style="color: var(--accent-cyan);">INTEGRATION_GUIDE.md</code></p>
+            <p style="margin-top: 1rem; font-size: var(--font-size-xs); opacity: 0.7;">
+                💡 Tip: Print this page or save as PDF for offline reference
+            </p>
+        </div>
+    </div>
+
+    <script src="/campuss/js/theme-manager.js"></script>
+    <script src="/campuss/js/animations.js"></script>
+    <script>
+        // Initialize theme manager
+        const themeManager = new ThemeManager();
+        themeManager.init();
+        themeManager.setupToggleListener();
+
+        // Download as image function
+        function downloadAsImage() {
+            // Using html2canvas library would be ideal
+            alert('💡 Tip: Use browser Print > Save as PDF instead');
+        }
+
+        // Ripple effect on all buttons
+        document.querySelectorAll('button').forEach(btn => {
+            new RippleButton(btn);
+        });
+
+        // Show welcome message
+        window.addEventListener('load', () => {
+            new Toast('Welcome to Design System Quick Reference! 🎨', 'success');
+        });
+    </script>
+</body>
+</html>

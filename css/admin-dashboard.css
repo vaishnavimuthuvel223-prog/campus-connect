@@ -1,0 +1,104 @@
+/* ================================================================
+   CAMPUSS — ADMIN MODULE LAYOUT FIX
+   Neutralises conflicting inline <style> from admin/dashboard.php
+   ================================================================ */
+
+.admin-page {
+  /* Layout is handled by all-modules.css / sidebar-fix.css */
+  padding-top: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  color: #111827 !important;
+}
+
+.admin-container {
+  max-width: 1180px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+.admin-page, .admin-page * {
+  color: #111827 !important;
+}
+
+.admin-header p {
+  color: #475569 !important;
+}
+
+.admin-card {
+  background: rgba(255,255,255,0.95) !important;
+  border-color: rgba(203,213,225,0.75) !important;
+  color: #111827 !important;
+}
+
+.admin-card-title {
+  color: #1e293b !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+.admin-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  font-size: 0.95rem !important;
+}
+
+.admin-table th {
+  padding: 1rem !important;
+  text-align: left !important;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff) !important;
+  color: #1e293b !important;
+  font-weight: 700 !important;
+  border-bottom: 2px solid #cbd5e1 !important;
+}
+
+body.admin-module .admin-page .admin-table th,
+body.admin-module .admin-page .admin-table thead tr th {
+  color: #1e293b !important;
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff) !important;
+}
+
+.admin-table td {
+  padding: 1rem !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  background: transparent !important;
+}
+
+.admin-table tr:hover td {
+  background: #f1f5ff !important;
+}
+
+.admin-stat-label {
+  color: rgba(15, 23, 42, 0.85) !important;
+}
+
+.admin-badge {
+  color: #111827 !important;
+}
+
+.admin-badge-success {
+  background: rgba(16, 185, 129, 0.18) !important;
+  color: #166534 !important;
+}
+
+.admin-badge-warning {
+  background: rgba(245, 158, 11, 0.18) !important;
+  color: #92400e !important;
+}
+
+.admin-badge-danger {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #7f1d1d !important;
+}
+
+.admin-btn {
+  color: #fff !important;
+}
+
+/* Ensure button text remains visible in admin dashboard */
+.admin-btn:hover,
+.admin-btn:focus {
+  color: #fff !important;
+}
+

@@ -1,0 +1,499 @@
+<?php
+// Security: Initialize session and security helper
+require_once '../config/db.php';
+
+$error = '';
+$loginAttempted = false;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $loginAttempted = true;
+    
+    // ===== CSRF TOKEN VALIDATION =====
+    if (!isset($_POST['csrf_token']) || !$security->verifyCSRFToken($_POST['csrf_token'])) {
+        $error = '⚠️ Security error: Invalid request token. Please try again.';
+    } else {
+        $staffId = trim($_POST['staff_id'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        // ===== INPUT VALIDATION =====
+        if (empty($staffId) || empty($password)) {
+            $error = '❌ Staff ID and password are required.';
+        } else {
+            // ===== RATE LIMITING CHECK =====
+            if (!$security->checkLoginAttempts($staffId)) {
+                $error = '⛔ Too many login attempts. Please try again after 15 minutes.';
+                $security->logLoginActivity(0, 'staff', $staffId, false);
+            } else {
+                $stmt = $conn->prepare("SELECT * FROM department_staff WHERE staff_code = ?");
+                $stmt->execute([$staffId]);
+                $staff = $stmt->fetch();
+
+                // ===== PASSWORD VERIFICATION =====
+                if ($staff && password_verify($password, $staff['password'])) {
+                    // ===== ADDITIONAL SECURITY CHECKS =====
+                    
+                    // Check if staff exists in database
+                    if (!$staff['staff_id']) {
+                        $error = '❌ Staff member not found in system.';
+                        $security->recordFailedAttempt($staffId);
+                    } else {
+                        // ===== PREVENT CONCURRENT SESSIONS =====
+                        if (!$security->preventConcurrentSessions($staff['staff_id'], 'staff')) {
+                            $error = '⛔ You already have an active session. Please logout first.';
+                            $security->recordFailedAttempt($staffId);
+                        } else {
+                            // ===== SUCCESSFUL LOGIN =====
+                        $security->clearLoginAttempts($staffId);
+                        
+                        // Register login with security
+                        $security->registerLogin($staff['staff_id'], 'staff', $staff['email']);
+                            $_SESSION['name'] = $staff['name'];
+                            $_SESSION['dept_id'] = $staff['dept_id'];
+                            $_SESSION['staff_code'] = $staff['staff_code'] ?? null;
+                            
+                            // Check if profile is complete
+                            if (!$staff['profile_completed']) {
+                                // Redirect to complete profile
+                                header('Location: complete_profile.php', true, 302);
+                            } else {
+                                // Redirect to dashboard
+                                header('Location: dashboard.php', true, 302);
+                            }
+                            exit;
+                        }
+                    }
+                } else {
+                    // ===== FAILED LOGIN =====
+                    $error = '❌ Invalid Staff ID or password.';
+                    $security->recordFailedAttempt($staffId);
+                    
+                    // Log failed attempt
+                    if (defined('LOG_FAILED_ATTEMPTS') && LOG_FAILED_ATTEMPTS) {
+                        error_log("Failed login attempt for staff: $staffId from IP: " . $security->getClientIP());
+                    }
+                }
+            }
+        }
+    }
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Login - Campus Recruitment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/campuss/css/style.css">
+    <style>
+        /* ===== STAFF LOGIN PAGE - MODERN ANIMATED ===== */
+        :root {
+            --module-primary: #8b5cf6;
+            --module-secondary: #6d28d9;
+            --module-accent: #14b8a6;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-15px) rotate(2deg); } }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Poppins', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: url('../uploads/clg.jpg') center/cover no-repeat fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+        
+        @media (max-width: 480px) {
+            body { padding: 0.75rem; }
+        }
+        
+        @media (min-width: 481px) and (max-width: 768px) {
+            body { padding: 1rem; }
+        }
+        
+        @media (min-width: 769px) {
+            body { padding: 1.5rem; }
+        }
+        
+        .login-container {
+            max-width: 420px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .login-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 2.5px solid rgba(139, 92, 246, 0.4);
+            border-radius: 28px;
+            padding: 2.2rem;
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.2), inset 0 0 30px rgba(255, 255, 255, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+            animation: slideUp 0.8s ease-out 0.1s both;
+            position: relative;
+            overflow: hidden;
+            border-image: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(6, 182, 212, 0.3)) 1;
+        }
+        
+        .login-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, transparent 100%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .login-card::after {
+            content: ''; position: absolute; inset: -2px;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed, #10b981, #8b5cf6);
+            background-size: 300% 300%;
+            border-radius: 28px;
+            z-index: -1;
+            opacity: 0;
+            animation: gradientShift 8s ease infinite;
+        }
+        
+        .login-card-content { position: relative; z-index: 2; }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 1.8rem;
+            animation: slideUp 0.8s ease-out 0.2s both;
+        }
+        
+        .login-icon {
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            animation: float 3s ease-in-out infinite;
+            display: inline-block;
+            filter: drop-shadow(0 10px 20px rgba(139, 92, 246, 0.2));
+        }
+        
+        .login-card h2 {
+            font-size: 1.9rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.8px;
+            animation: slideUp 0.8s ease-out 0.23s both;
+        }
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.8px;
+            animation: slideUp 0.8s ease-out 0.23s both;
+        }
+        
+        .login-card .subtitle {
+            font-size: 0.95rem;
+            color: #6b7280;
+            font-weight: 500;
+            animation: slideUp 0.8s ease-out 0.26s both;
+        }
+        
+        .login-form {
+            animation: slideUp 0.8s ease-out 0.3s both;
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+            animation: slideUp 0.8s ease-out;
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.35s; }
+        .form-group:nth-child(2) { animation-delay: 0.42s; }
+        
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            color: #1f2937;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+        
+        .form-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-input-icon {
+            position: absolute;
+            left: 14px;
+            font-size: 1rem;
+            color: #9ca3af;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.95rem 1rem 0.95rem 3rem;
+            border: 2px solid rgba(139, 92, 246, 0.15);
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.8);
+            color: #1f2937;
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--module-primary);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1), inset 0 0 10px rgba(139, 92, 246, 0.05);
+        }
+        
+        .form-control:focus ~ .form-input-icon {
+            color: #c4b5fd;
+            transform: scale(1.2) rotate(10deg);
+        }
+        
+        .form-control::placeholder {
+            color: #9ca3af;
+        }
+        
+        .btn-login {
+            width: 100%;
+            padding: 1.1rem;
+            background: linear-gradient(135deg, var(--module-primary), var(--module-secondary));
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.35), 0 0 0 0 rgba(139, 92, 246, 0);
+            margin-top: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: slideUp 0.8s ease-out 0.5s both;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn-login::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            z-index: 0;
+        }
+        
+        .btn-login::after {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(139, 92, 246, 0.45), 0 0 20px rgba(109, 40, 217, 0.2);
+        }
+        
+        .btn-login:hover::before {
+            transform: translateX(100%);
+        }
+        
+        .btn-login:hover::after {
+            opacity: 1;
+        }
+        
+        .btn-login:active {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.35) !important;
+        }
+        
+        .btn-login span {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            border: 1px solid transparent;
+            animation: slideUp 0.5s ease-out;
+            backdrop-filter: blur(10px);
+        }
+        
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-color: rgba(239, 68, 68, 0.2);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.08);
+        }
+        
+        .form-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.08);
+            animation: slideUp 0.8s ease-out 0.58s both;
+        }
+        
+        .form-footer p {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+        
+        .form-footer a {
+            color: #c4b5fd;
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            display: inline-block;
+            position: relative;
+            padding-bottom: 3px;
+        }
+        
+        .form-footer a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0%;
+            height: 2px;
+            background: linear-gradient(90deg, #c4b5fd, #a78bfa);
+            transition: width 0.3s ease;
+        }
+        
+        .form-footer a:hover {
+            color: #e9d5ff;
+        }
+        
+        .form-footer a:hover::after {
+            width: 100%;
+        }
+        
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.75rem;
+        }
+        
+        .back-link:hover {
+            gap: 0.7rem;
+        }
+        
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 2rem;
+                border-radius: 18px;
+            }
+            
+            .login-card h2 {
+                font-size: 1.6rem;
+            }
+            
+            .login-icon {
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="float-orb orb-1"></div>
+<div class="float-orb orb-2"></div>
+<div class="float-orb orb-3"></div>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-card-content">
+        <div class="login-header">
+            <div class="login-icon"></div>
+            <h2>Staff Login</h2>
+            <p class="subtitle">Department Staff Portal</p>
+        </div>
+        
+        <?php if ($error): ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        
+        <form method="POST" class="login-form">
+            <!-- CSRF Protection Token -->
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($security->generateCSRFToken()) ?>">
+            
+            <div class="form-group">
+                <label for="staff_id">Staff ID</label>
+                <div class="form-input-wrapper">
+                    <input 
+                        type="text" 
+                        id="staff_id"
+                        name="staff_id" 
+                        class="form-control" 
+                        placeholder="e.g. CSE-001"
+                        required 
+                        value="<?= htmlspecialchars($_POST['staff_id'] ?? '') ?>"
+                        autocomplete="off"
+                    >
+                    <span class="form-input-icon">🆔</span>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="form-input-wrapper">
+                    <input 
+                        type="password" 
+                        id="password"
+                        name="password" 
+                        class="form-control" 
+                        placeholder="Enter your password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <span class="form-input-icon">🔒</span>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-login">
+                <span>Access Dashboard</span>
+            </button>
+        </form>
+        
+        <div class="form-footer">
+            <p style="margin-top: 1rem; margin-bottom: 0.5rem;">
+                <a href="/campuss/" class="back-link">← Back to Home</a>
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

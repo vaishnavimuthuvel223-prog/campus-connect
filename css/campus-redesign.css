@@ -1,0 +1,945 @@
+/* ================================================================
+   CAMPUSS — COMPLETE LAYOUT FIX + COLORFUL REDESIGN
+   campus-redesign.css  |  Add LAST in header.php after all other CSS
+   Fixes: sidebar overlap, plain white pages, no card colors
+   ================================================================ */
+
+/* ── UNIVERSAL BOX MODEL ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── DESIGN TOKENS ──────────────────────────────────────────────
+   Student  → blue/cyan
+   Staff    → purple/violet
+   Admin    → indigo/emerald
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --sidebar-w: 255px;
+
+  /* Student palette */
+  --s-pri:   #2563eb;
+  --s-sec:   #0891b2;
+  --s-grad:  linear-gradient(135deg, #2563eb 0%, #0891b2 100%);
+  --s-light: #eff6ff;
+  --s-glow:  rgba(37,99,235,.20);
+
+  /* Staff palette */
+  --t-pri:   #7c3aed;
+  --t-sec:   #0ea5e9;
+  --t-grad:  linear-gradient(135deg, #7c3aed 0%, #0ea5e9 100%);
+  --t-light: #f5f3ff;
+  --t-glow:  rgba(124,58,237,.20);
+
+  /* Admin palette */
+  --a-pri:   #4f46e5;
+  --a-sec:   #10b981;
+  --a-grad:  linear-gradient(135deg, #4f46e5 0%, #10b981 100%);
+  --a-light: #eef2ff;
+  --a-glow:  rgba(79,70,229,.20);
+
+  /* Shared background */
+  --page-bg: #f0f4ff;
+  --card-bg: #ffffff;
+  --card-radius: 18px;
+  --card-shadow: 0 4px 24px rgba(30,41,99,.08);
+  --card-hover-shadow: 0 12px 40px rgba(30,41,99,.16);
+}
+
+/* ================================================================
+   LAYOUT: PUSH ALL CONTENT RIGHT OF SIDEBAR
+   Every outer wrapper used across student/staff/admin pages
+   ================================================================ */
+.stud-page,
+.staff-page,
+.admin-page,
+.drives-page,
+.results-page,
+.apps-page,
+.lb-page,
+.page-wrapper,
+body > .container {
+  margin-left: var(--sidebar-w) !important;
+  min-height: 100vh !important;
+  padding: 2.2rem 2.4rem 3rem !important;
+  background: var(--page-bg) !important;
+}
+
+/* Sub-containers — reset their own margin/padding */
+.drives-container,
+.results-container,
+.lb-container,
+.stud-container,
+.staff-container,
+.admin-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+/* ── PAGE HEADER TITLES ─────────────────────────────────────────
+   These are inner divs, NOT outer wrappers — keep them normal
+   ─────────────────────────────────────────────────────────────── */
+.page-header:not(body > .page-header) {
+  margin-bottom: 2rem !important;
+}
+
+/* When page-header IS the outermost div (staff/admin sub-pages) */
+body > .page-header {
+  margin-left: var(--sidebar-w) !important;
+  padding: 2.2rem 2.4rem 3rem !important;
+  min-height: 100vh !important;
+  background: var(--page-bg) !important;
+}
+
+/* ================================================================
+   MOBILE: COLLAPSE SIDEBAR OFFSET
+   ================================================================ */
+@media (max-width: 900px) {
+  .stud-page, .staff-page, .admin-page,
+  .drives-page, .results-page, .apps-page,
+  .lb-page, .page-wrapper,
+  body > .container, body > .page-header {
+    margin-left: 0 !important;
+    padding: 5rem 1rem 2rem !important;
+  }
+}
+
+/* ================================================================
+   ANIMATED GRADIENT PAGE BACKGROUNDS
+   ================================================================ */
+body.student-module {
+  background: linear-gradient(145deg, #e0eaff 0%, #f0f9ff 40%, #e8f5e9 100%) !important;
+  background-attachment: fixed !important;
+}
+body.staff-module {
+  background: linear-gradient(145deg, #ede9fe 0%, #f0f9ff 40%, #fdf4ff 100%) !important;
+  background-attachment: fixed !important;
+}
+body.admin-module {
+  background: linear-gradient(145deg, #eef2ff 0%, #f0fdf4 40%, #f8fafc 100%) !important;
+  background-attachment: fixed !important;
+}
+
+/* ================================================================
+   GLOBAL CARD BASE — applied to ANY .card, .drive-card, etc.
+   ================================================================ */
+.card,
+.drive-card,
+.results-table-card,
+.stud-card,
+.staff-card,
+.admin-card,
+.detail-item,
+.stat-card,
+.notif-item,
+.lb-row,
+.section-card,
+.form-card,
+.info-card,
+.company-card,
+.dept-card,
+.app-card {
+  background: var(--card-bg) !important;
+  border-radius: var(--card-radius) !important;
+  box-shadow: var(--card-shadow) !important;
+  border: none !important;
+  transition: transform .25s ease, box-shadow .25s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.card:hover,
+.drive-card:hover,
+.stud-card:hover,
+.staff-card:hover,
+.admin-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+/* ── Colour accent bar on top of every card ───────────────────── */
+body.student-module .card::before,
+body.student-module .drive-card::before,
+body.student-module .stud-card::before,
+body.student-module .results-table-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--s-grad);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+body.staff-module .card::before,
+body.staff-module .staff-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--t-grad);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+body.admin-module .card::before,
+body.admin-module .admin-card::before,
+body.admin-module .company-card::before,
+body.admin-module .dept-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--a-grad);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+
+/* ================================================================
+   DRIVES PAGE — extra colorful treatment
+   ================================================================ */
+.drive-card {
+  padding: 1.8rem !important;
+  margin-bottom: 1.5rem !important;
+  border-top: 4px solid transparent !important;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #2563eb, #0891b2) border-box !important;
+  border-radius: 18px !important;
+}
+
+.drives-header h1,
+.results-header h1,
+.drives-header h2 {
+  font-size: 2.2rem !important;
+  font-weight: 900 !important;
+  background: var(--s-grad) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+body.staff-module .drives-header h1,
+body.staff-module .results-header h1 {
+  background: var(--t-grad) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+body.admin-module .drives-header h1,
+body.admin-module .results-header h1 {
+  background: var(--a-grad) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+.detail-item {
+  background: linear-gradient(135deg, #f0f4ff, #e8f5ff) !important;
+  border-radius: 12px !important;
+  border-left: 3px solid #2563eb !important;
+  padding: 1rem !important;
+}
+
+.detail-label {
+  color: #2563eb !important;
+  font-weight: 700 !important;
+  font-size: 0.72rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: .6px !important;
+}
+
+.detail-value {
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+}
+
+/* ================================================================
+   PAGE HEADER TITLES (h1/h2 inside page-header divs)
+   ================================================================ */
+.page-header h1,
+.page-header h2 {
+  font-weight: 900 !important;
+  font-size: 2rem !important;
+  margin: 0 0 .4rem !important;
+}
+
+body.student-module .page-header h1,
+body.student-module .page-header h2 {
+  background: var(--s-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+body.staff-module .page-header h1,
+body.staff-module .page-header h2 {
+  background: var(--t-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+body.admin-module .page-header h1,
+body.admin-module .page-header h2 {
+  background: var(--a-grad);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ================================================================
+   STATS ROW — colorful gradient cards (generic selectors)
+   ================================================================ */
+
+/* Student stat cards */
+body.student-module .stud-stat:nth-child(1),
+body.student-module .stat-card:nth-child(1) {
+  background: linear-gradient(135deg,#2563eb,#1d4ed8) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(37,99,235,.35) !important;
+}
+body.student-module .stud-stat:nth-child(2),
+body.student-module .stat-card:nth-child(2) {
+  background: linear-gradient(135deg,#0ea5e9,#0891b2) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(14,165,233,.35) !important;
+}
+body.student-module .stud-stat:nth-child(3),
+body.student-module .stat-card:nth-child(3) {
+  background: linear-gradient(135deg,#f59e0b,#d97706) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(245,158,11,.35) !important;
+}
+body.student-module .stud-stat:nth-child(4),
+body.student-module .stat-card:nth-child(4) {
+  background: linear-gradient(135deg,#8b5cf6,#7c3aed) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(139,92,246,.35) !important;
+}
+
+/* Staff stat cards */
+body.staff-module .staff-stat:nth-child(1),
+body.staff-module .stat-card:nth-child(1) {
+  background: linear-gradient(135deg,#7c3aed,#6d28d9) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(124,58,237,.35) !important;
+}
+body.staff-module .staff-stat:nth-child(2),
+body.staff-module .stat-card:nth-child(2) {
+  background: linear-gradient(135deg,#0ea5e9,#0284c7) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(14,165,233,.35) !important;
+}
+body.staff-module .staff-stat:nth-child(3),
+body.staff-module .stat-card:nth-child(3) {
+  background: linear-gradient(135deg,#10b981,#059669) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(16,185,129,.35) !important;
+}
+body.staff-module .staff-stat:nth-child(4),
+body.staff-module .stat-card:nth-child(4) {
+  background: linear-gradient(135deg,#f59e0b,#d97706) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(245,158,11,.35) !important;
+}
+
+/* Admin stat cards */
+body.admin-module .admin-stat:nth-child(1),
+body.admin-module .stat-card:nth-child(1) {
+  background: linear-gradient(135deg,#4f46e5,#4338ca) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(79,70,229,.35) !important;
+}
+body.admin-module .admin-stat:nth-child(2),
+body.admin-module .stat-card:nth-child(2) {
+  background: linear-gradient(135deg,#0ea5e9,#0891b2) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(14,165,233,.35) !important;
+}
+body.admin-module .admin-stat:nth-child(3),
+body.admin-module .stat-card:nth-child(3) {
+  background: linear-gradient(135deg,#10b981,#059669) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(16,185,129,.35) !important;
+}
+body.admin-module .admin-stat:nth-child(4),
+body.admin-module .stat-card:nth-child(4) {
+  background: linear-gradient(135deg,#f59e0b,#d97706) !important;
+  color: #fff !important; box-shadow: 0 8px 24px rgba(245,158,11,.35) !important;
+}
+
+/* Stat number & label text on coloured cards */
+.stud-stat *, .staff-stat *, .admin-stat *, .stat-card * {
+  color: inherit !important;
+}
+.stud-stat-num, .staff-stat-num, .admin-stat-num,
+.stat-number, .stat-value {
+  font-size: 2.6rem !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+.stud-stat-label, .staff-stat-label, .admin-stat-label,
+.stat-label {
+  font-size: 0.82rem !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+  margin-top: .35rem !important;
+  letter-spacing: .3px !important;
+}
+
+/* ================================================================
+   TABLES — stripe + coloured header
+   ================================================================ */
+table, .ref-table, .data-table, .results-table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border-radius: 14px !important;
+  overflow: hidden !important;
+  box-shadow: var(--card-shadow) !important;
+}
+table thead tr th, .ref-table th {
+  padding: 1rem 1.1rem !important;
+  font-size: .82rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .5px !important;
+  border: none !important;
+}
+body.student-module table thead tr th,
+body.student-module .ref-table th {
+  background: linear-gradient(90deg,#2563eb,#0891b2) !important;
+  color: #fff !important;
+}
+body.staff-module table thead tr th,
+body.staff-module .ref-table th {
+  background: linear-gradient(90deg,#7c3aed,#0ea5e9) !important;
+  color: #fff !important;
+}
+body.admin-module table thead tr th,
+body.admin-module .ref-table th {
+  background: linear-gradient(90deg,#4f46e5,#10b981) !important;
+  color: #fff !important;
+}
+table tbody tr td, .ref-table td {
+  padding: .85rem 1.1rem !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  font-size: .93rem !important;
+  color: #334155 !important;
+}
+table tbody tr:nth-child(even) td { background: #f8faff !important; }
+table tbody tr:hover td {
+  background: #eff6ff !important;
+  transition: background .15s !important;
+}
+
+/* ================================================================
+   BUTTONS — module-coloured CTAs
+   ================================================================ */
+.btn-primary, .apply-btn, .btn-action,
+button[type="submit"], .submit-btn {
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  padding: .75rem 1.8rem !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all .25s !important;
+  font-size: .95rem !important;
+  letter-spacing: .2px !important;
+}
+body.student-module .btn-primary,
+body.student-module .apply-btn,
+body.student-module button[type="submit"],
+body.student-module .submit-btn {
+  background: var(--s-grad) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px var(--s-glow) !important;
+}
+body.student-module .btn-primary:hover,
+body.student-module .apply-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 28px var(--s-glow) !important;
+}
+body.staff-module .btn-primary,
+body.staff-module button[type="submit"],
+body.staff-module .submit-btn {
+  background: var(--t-grad) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px var(--t-glow) !important;
+}
+body.admin-module .btn-primary,
+body.admin-module button[type="submit"],
+body.admin-module .submit-btn {
+  background: var(--a-grad) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 16px var(--a-glow) !important;
+}
+
+/* ================================================================
+   FORM INPUTS
+   ================================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select, textarea {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  padding: .65rem 1rem !important;
+  font-size: .95rem !important;
+  font-family: inherit !important;
+  width: 100% !important;
+  transition: border-color .2s, box-shadow .2s !important;
+  background: #fff !important;
+}
+body.student-module input:focus,
+body.student-module select:focus,
+body.student-module textarea:focus {
+  outline: none !important;
+  border-color: var(--s-pri) !important;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12) !important;
+}
+body.staff-module input:focus,
+body.staff-module select:focus,
+body.staff-module textarea:focus {
+  outline: none !important;
+  border-color: var(--t-pri) !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,.12) !important;
+}
+body.admin-module input:focus,
+body.admin-module select:focus,
+body.admin-module textarea:focus {
+  outline: none !important;
+  border-color: var(--a-pri) !important;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.12) !important;
+}
+
+/* ================================================================
+   BADGE / STATUS PILLS
+   ================================================================ */
+.badge, .status-badge, .badge-pill,
+.drive-status, .status-tag, .tag {
+  border-radius: 20px !important;
+  padding: .3rem .9rem !important;
+  font-size: .78rem !important;
+  font-weight: 700 !important;
+  display: inline-block !important;
+  letter-spacing: .3px !important;
+}
+.badge-pass, .status-upcoming, .badge-selected, .status-active {
+  background: rgba(34,197,94,.12) !important;
+  color: #16a34a !important;
+  border: 1px solid rgba(34,197,94,.3) !important;
+}
+.badge-fail, .status-completed, .badge-rejected, .status-closed {
+  background: rgba(239,68,68,.1) !important;
+  color: #dc2626 !important;
+  border: 1px solid rgba(239,68,68,.25) !important;
+}
+.badge-pending, .status-ongoing, .badge-waitlist {
+  background: rgba(245,158,11,.12) !important;
+  color: #b45309 !important;
+  border: 1px solid rgba(245,158,11,.3) !important;
+}
+
+/* ================================================================
+   NOTIFICATIONS PAGE
+   ================================================================ */
+.notif-page-header {
+  margin-left: 0 !important;
+  padding: 0 0 1.5rem 0 !important;
+  min-height: unset !important;
+  width: auto !important;
+  background: transparent !important;
+}
+.notif-item {
+  background: #fff !important;
+  border-radius: 14px !important;
+  padding: 1.2rem 1.4rem !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 2px 12px rgba(37,99,235,.07) !important;
+  border-left: 4px solid #2563eb !important;
+  transition: transform .2s, box-shadow .2s !important;
+}
+.notif-item:hover {
+  transform: translateX(4px) !important;
+  box-shadow: 0 6px 20px rgba(37,99,235,.13) !important;
+}
+.notif-item.unread {
+  background: linear-gradient(90deg, #eff6ff, #fff) !important;
+}
+
+/* ================================================================
+   LEADERBOARD PAGE
+   ================================================================ */
+.lb-page {
+  background: var(--page-bg) !important;
+}
+.lb-row {
+  background: #fff !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.4rem !important;
+  margin-bottom: .75rem !important;
+  box-shadow: 0 2px 10px rgba(30,41,99,.07) !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  border-left: 4px solid transparent !important;
+  transition: all .2s !important;
+}
+.lb-row:nth-child(1) { border-left-color: #f59e0b !important; background: linear-gradient(90deg,#fffbeb,#fff) !important; }
+.lb-row:nth-child(2) { border-left-color: #94a3b8 !important; background: linear-gradient(90deg,#f8fafc,#fff) !important; }
+.lb-row:nth-child(3) { border-left-color: #cd7c2f !important; background: linear-gradient(90deg,#fdf3ea,#fff) !important; }
+.lb-row:hover { transform: translateX(4px) !important; box-shadow: 0 6px 20px rgba(30,41,99,.12) !important; }
+
+/* ================================================================
+   CALENDAR PAGE
+   ================================================================ */
+.cal-grid { border-radius: 14px !important; overflow: hidden !important; }
+.cal-day-header {
+  background: linear-gradient(90deg,#2563eb,#0891b2) !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: .8rem !important;
+  padding: .75rem !important;
+  text-align: center !important;
+}
+.cal-day {
+  border-radius: 8px !important;
+  transition: background .15s !important;
+}
+.cal-day:hover { background: #eff6ff !important; }
+.cal-day.has-event { background: rgba(37,99,235,.08) !important; }
+.cal-dot-upcoming { background: #2563eb !important; }
+.cal-dot-ongoing  { background: #10b981 !important; }
+.cal-dot-completed{ background: #94a3b8 !important; }
+.cal-dot-deadline { background: #ef4444 !important; }
+
+/* ================================================================
+   RESULTS PAGE
+   ================================================================ */
+.results-page {
+  padding-top: 2.2rem !important;
+}
+.results-table-card {
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  box-shadow: var(--card-shadow) !important;
+  background: #fff !important;
+}
+
+/* ================================================================
+   INTERVIEW PREP PAGE
+   ================================================================ */
+.prep-card, .tip-card, .resource-card {
+  background: #fff !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--card-shadow) !important;
+  border-top: 4px solid transparent !important;
+  transition: transform .2s, box-shadow .2s !important;
+}
+body.student-module .prep-card,
+body.student-module .tip-card,
+body.student-module .resource-card {
+  border-top-color: #2563eb !important;
+}
+.prep-card:hover, .tip-card:hover, .resource-card:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+/* ================================================================
+   ADMIN — COMPANY / DEPARTMENT / STAFF CARDS
+   ================================================================ */
+.company-card, .dept-card, .staff-card {
+  background: #fff !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  box-shadow: var(--card-shadow) !important;
+  border-top: 4px solid #4f46e5 !important;
+  transition: all .25s !important;
+}
+.company-card:hover, .dept-card:hover, .staff-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: var(--card-hover-shadow) !important;
+}
+
+/* ================================================================
+   PROFILE PAGES — nice field cards
+   ================================================================ */
+.profile-field, .info-field, .field-group {
+  background: #f8faff !important;
+  border-radius: 12px !important;
+  padding: 1rem 1.2rem !important;
+  border-left: 3px solid #2563eb !important;
+  margin-bottom: .75rem !important;
+}
+body.staff-module .profile-field,
+body.staff-module .info-field {
+  border-left-color: #7c3aed !important;
+}
+body.admin-module .profile-field,
+body.admin-module .info-field {
+  border-left-color: #4f46e5 !important;
+}
+.profile-label, .field-label {
+  font-size: .72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: .6px !important;
+  color: #64748b !important;
+  margin-bottom: .25rem !important;
+}
+.profile-value, .field-value {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+}
+
+/* ================================================================
+   REPORTS PAGE — charts/stat boxes
+   ================================================================ */
+.report-stat {
+  background: #fff !important;
+  border-radius: 16px !important;
+  padding: 1.4rem !important;
+  box-shadow: var(--card-shadow) !important;
+  border-top: 4px solid #4f46e5 !important;
+  text-align: center !important;
+}
+.report-stat-num {
+  font-size: 2.4rem !important;
+  font-weight: 900 !important;
+  background: var(--a-grad) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+}
+
+/* ================================================================
+   SECTION HEADINGS inside pages
+   ================================================================ */
+h2.section-title, h3.section-title, .section-heading {
+  font-weight: 800 !important;
+  font-size: 1.3rem !important;
+  margin: 2rem 0 1rem !important;
+  padding-bottom: .5rem !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+}
+body.student-module h2.section-title,
+body.student-module .section-heading { color: var(--s-pri) !important; border-color: var(--s-pri) !important; }
+body.staff-module h2.section-title,
+body.staff-module .section-heading   { color: var(--t-pri) !important; border-color: var(--t-pri) !important; }
+body.admin-module h2.section-title,
+body.admin-module .section-heading   { color: var(--a-pri) !important; border-color: var(--a-pri) !important; }
+
+/* ================================================================
+   ALERT / SUCCESS / ERROR BANNERS
+   ================================================================ */
+.alert, .alert-box {
+  border-radius: 12px !important;
+  padding: 1rem 1.4rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 1.5rem !important;
+  border-left: 4px solid !important;
+}
+.alert-success, .alert-box.alert-success {
+  background: rgba(16,185,129,.08) !important;
+  border-left-color: #10b981 !important;
+  color: #065f46 !important;
+}
+.alert-danger, .alert-error, .alert-box.alert-danger {
+  background: rgba(239,68,68,.08) !important;
+  border-left-color: #ef4444 !important;
+  color: #7f1d1d !important;
+}
+.alert-warning {
+  background: rgba(245,158,11,.08) !important;
+  border-left-color: #f59e0b !important;
+  color: #78350f !important;
+}
+.alert-info {
+  background: rgba(37,99,235,.08) !important;
+  border-left-color: #2563eb !important;
+  color: #1e3a8a !important;
+}
+
+/* ================================================================
+   EMPTY STATE BOXES
+   ================================================================ */
+.empty-state {
+  background: linear-gradient(135deg, #f8faff, #eff6ff) !important;
+  border-radius: 18px !important;
+  border: 2px dashed #bfdbfe !important;
+  padding: 3rem 2rem !important;
+  text-align: center !important;
+}
+body.staff-module .empty-state {
+  background: linear-gradient(135deg, #faf5ff, #f0e6ff) !important;
+  border-color: #d8b4fe !important;
+}
+body.admin-module .empty-state {
+  background: linear-gradient(135deg, #eef2ff, #f0fdf4) !important;
+  border-color: #a5b4fc !important;
+}
+
+/* ================================================================
+   SEARCH / FILTER BARS
+   ================================================================ */
+.search-bar, .filter-bar, .search-box {
+  background: #fff !important;
+  border-radius: 14px !important;
+  padding: 1rem 1.4rem !important;
+  box-shadow: var(--card-shadow) !important;
+  margin-bottom: 1.5rem !important;
+  display: flex !important;
+  gap: 1rem !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+}
+
+/* ================================================================
+   PAGINATION
+   ================================================================ */
+.btn-page, .page-btn {
+  border-radius: 8px !important;
+  padding: .5rem 1rem !important;
+  font-weight: 600 !important;
+  font-size: .88rem !important;
+  background: #fff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  color: #334155 !important;
+  text-decoration: none !important;
+  transition: all .2s !important;
+}
+.btn-page:hover, .page-btn:hover {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #2563eb !important;
+}
+
+/* ================================================================
+   MODAL POLISH
+   ================================================================ */
+.modal-box {
+  border-radius: 20px !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25) !important;
+  padding: 2rem !important;
+  background: #fff !important;
+}
+.modal-title {
+  font-weight: 800 !important;
+  font-size: 1.3rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 2px solid #e2e8f0 !important;
+  margin-bottom: 1.5rem !important;
+}
+
+/* ================================================================
+   ANIMATION — cards fade up on load
+   ================================================================ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.drive-card, .card, .stud-card, .staff-card, .admin-card,
+.stud-stat, .staff-stat, .admin-stat,
+.notif-item, .lb-row, .report-stat,
+.company-card, .dept-card {
+  animation: fadeUp .45s ease-out both !important;
+}
+/* Stagger children */
+.drive-card:nth-child(1), .card:nth-child(1) { animation-delay: .05s !important; }
+.drive-card:nth-child(2), .card:nth-child(2) { animation-delay: .10s !important; }
+.drive-card:nth-child(3), .card:nth-child(3) { animation-delay: .15s !important; }
+.drive-card:nth-child(4), .card:nth-child(4) { animation-delay: .20s !important; }
+.drive-card:nth-child(5), .card:nth-child(5) { animation-delay: .25s !important; }
+
+/* ================================================================
+   WELCOME DROP ANIMATION — slides down from top with rotation
+   ================================================================ */
+.welcome-drop {
+  animation: dropIn 1s ease-out !important;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-50px) rotate(-10deg) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* ================================================================
+   TEXT ZOOM EFFECT — for card headers and content
+   ================================================================ */
+.card h1, .card h2, .card h3, .card h4, .card h5, .card h6,
+.card .card-header, .stat-label, .stat-num {
+  animation: textZoom 3s ease-in-out infinite alternate !important;
+}
+
+@keyframes textZoom {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+
+/* ================================================================
+   ZOOM AND ROLL EFFECTS — for dashboard elements
+   ================================================================ */
+.stud-page .card, .staff-page .card, .admin-page .card {
+  animation: zoomRoll 2s ease-in-out infinite alternate !important;
+}
+
+@keyframes zoomRoll {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.02) rotate(1deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* ================================================================
+   SCROLLBAR — thin, themed
+   ================================================================ */
+body { scrollbar-width: thin; scrollbar-color: #c7d2fe #f8fafc; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f8fafc; }
+::-webkit-scrollbar-thumb { background: #c7d2fe; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #818cf8; }
+
+/* ================================================================
+   LAYOUT OVERRIDES — unify page wrappers and content alignment
+   These rules are last in header.php, so they override duplicates.
+   ================================================================ */
+.page-wrapper,
+.main-content-wrapper,
+.stud-page,
+.staff-page,
+.admin-page,
+.drives-page,
+.results-page,
+.apps-page,
+.lb-page,
+.notif-page-header,
+body > .container,
+body > .page-header {
+  margin-left: var(--sidebar-w, 255px) !important;
+  min-height: 100vh !important;
+  padding: 2.2rem 2.4rem 3rem !important;
+  background: var(--page-bg, #f0f4ff) !important;
+  width: calc(100% - var(--sidebar-w, 255px)) !important;
+  box-sizing: border-box !important;
+}
+
+.page-wrapper > .container,
+.main-content-wrapper > .container,
+.stud-page > .stud-container,
+.staff-page > .staff-container,
+.admin-page > .admin-container,
+.drives-page > .drives-container,
+.results-page > .results-container,
+.apps-page > .apps-container,
+.lb-page > .lb-container,
+.notif-page-header > .container,
+body > .container > .container {
+  max-width: 1180px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .page-wrapper,
+  .main-content-wrapper,
+  .stud-page,
+  .staff-page,
+  .admin-page,
+  .drives-page,
+  .results-page,
+  .apps-page,
+  .lb-page,
+  .notif-page-header,
+  body > .container,
+  body > .page-header {
+    margin-left: 0 !important;
+    width: auto !important;
+    padding: 5rem 1rem 2rem !important;
+  }
+}
